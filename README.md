@@ -14,8 +14,8 @@ Create and activate the virtual environment.
 
 ```
 cd ttest
-python -m venv ttest_env
-source ttest_env/bin/activate
+python -m venv tt_env
+source tt_env/bin/activate
 ```
 
 Install dependencies.
@@ -36,5 +36,5 @@ Run the server.
 python manage.py runserver
 ```
 
-View django-project at 127.0.0.1:8000.
+View django-project at localhost:8000 
 
