@@ -203,3 +203,6 @@ def get_effect_size(data1, data2):
     den = data1['n'] + data2['n'] - 2
     pooled_sd = math.sqrt(num/den)  # pooled sd
     return round(abs(mean_difference / pooled_sd),DEC)
+
+  
+
