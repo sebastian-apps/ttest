@@ -1,4 +1,4 @@
-# Welch's t-test calculator
+# Welch's *t*-test calculator
 
 <br />
 
