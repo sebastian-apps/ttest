@@ -1,7 +1,6 @@
 # Welch's t-test calculator
 
-
-<br /><br />
+<br />
 
 ## Installation
 
