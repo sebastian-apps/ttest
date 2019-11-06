@@ -62,8 +62,8 @@ def ttest(request):
         # Define chart's x-axis range.
         x_min, x_max = get_x_axis_min_max(data1, data2)
         # Get curve x,y values for plotting.
-        curve1, step_size1 = get_t_curve(data1, df, x_min, x_max)
-        curve2, step_size2 = get_t_curve(data2, df, x_min, x_max)
+        curve1, step_size1 = get_t_curve(data1, x_min, x_max)
+        curve2, step_size2 = get_t_curve(data2, x_min, x_max)
 
         # Configure the x-axis step size for a more visually appealing chart.
         if step_size1 > step_size2:
@@ -112,8 +112,9 @@ def get_stats(dataset):
 
 
 
-def get_t_curve(data, df, min, max):
+def get_t_curve(data, min, max):
     """ Return x,y coordinates of t distribution. """
+    df = data['n']-1
     step_size = (max - min) / 50   # 50 is an arbitrary number
     x_list = [round(min + step_size*i, 6) for i in range(0, 50)]
     try:
