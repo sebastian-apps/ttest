@@ -802,7 +802,7 @@ function t_distrib(x, dof, mean, sd){
 function draw_alpha_curve(){
   // Fill the area under the curve representing alpha.
   alpha_curve = [];
-  alpha_curve.push({x: crit_t_value_x, y: t_distrib(crit_t_value_x, df, group1.mean, group1.sd)}); // this datapoint connects with the critical t vertical line
+  alpha_curve.push({x: crit_t_value_x, y: t_distrib(crit_t_value_x, group1.n-1, group1.mean, group1.sd)}); // this datapoint connects with the critical t vertical line
   for(var i = 0; i < group1.curve.length; i++) {
     if (group1.curve[i]['x'] > crit_t_value_x){
       alpha_curve.push({x: group1.curve[i]['x'], y: group1.curve[i]['y']});
@@ -821,7 +821,7 @@ function draw_beta_curve(){
       beta_curve.push({x: group2.curve[i]['x'], y: group2.curve[i]['y']});
     }
   }
-  beta_curve.push({x: crit_t_value_x, y: t_distrib(crit_t_value_x, df, group2.mean, group2.sd)}); // this datapoint connects with the critical t vertical line
+  beta_curve.push({x: crit_t_value_x, y: t_distrib(crit_t_value_x, group2.n-1, group2.mean, group2.sd)}); // this datapoint connects with the critical t vertical line
   lineChart.data.datasets[4]['data'] = beta_curve;
   lineChart.update();
 }
