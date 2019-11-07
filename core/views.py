@@ -14,11 +14,71 @@ import statistics
 DEC = 4  # Round values to a constant number of decimal places.
 
 
+
+
+class Data:
+    """
+    An instance represents one dataset. Each instance calculates its own descriptive statistics.
+    Data instances can be compared to calculate inferential statistics.
+    """
+    def __init__(self, dataset):
+        self.dataset = dataset
+        self.calc_descriptive_stats()
+
+
+    def calc_descriptive_stats(self):
+        self.mean = statistics.mean(self.dataset)
+        self.sd = statistics.stdev(self.dataset)
+        self.n = len(self.dataset)
+        self.df = self.n - 1  # degrees of freedom
+        self.dist = [] # distribution
+        self.step_size = 0;
+
+
+    def create_t_dist(self, min, max):
+        """ Create x,y coordinates of t distribution for a given range. """
+        self.step_size = (max - min) / 50   # 50 is an arbitrary number
+        x_list = [round(min + self.step_size*i, 6) for i in range(0, 50)]
+
+        try:
+            coords = []
+            for x in x_list:
+                t = (x-self.mean)/self.sd
+                y = round((math.gamma((self.df+1)/2)/(math.sqrt(self.df*math.pi)*math.gamma(self.df/2))) * (1+((t**2)/self.df))**(-(self.df+1)/2),DEC)
+                coords.append({'x': x, 'y': y})
+            self.dist = coords
+
+        except Exception as e:
+            print(str(e))
+            self.dist = []
+
+
+    def convert_t_to_x(self, t):
+        return round(self.mean + (abs(t) * self.sd), DEC)
+
+
+    def __str__(self):
+        return str(self.clean())
+
+    def clean(self):
+        return {
+            "dataset": self.dataset,
+            "dist": self.dist,
+            "step_size": self.step_size,
+            "mean": round(self.mean, DEC),
+            "sd": round(self.sd, DEC),
+            "n": self.n,
+            "df": self.df,
+        }
+
+
+
+
+
+
 def ttest(request):
 
     model_instance = None
-    data1 = {}
-    data2 = {}
     test_results = {}
     axes = {}
 
@@ -28,11 +88,13 @@ def ttest(request):
         # Default datasets
         dataset1 = [87, 101, 64, 86, 87, 82, 70]
         dataset2 = [100, 124, 93, 114, 123, 130, 136, 120, 107, 69, 120]
-        form.fields['dataset1'].initial = str(dataset1).replace(", ","\n").replace("[","").replace("]","")
-        form.fields['dataset2'].initial = str(dataset2).replace(", ","\n").replace("[","").replace("]","")
+        form.fields['dataset1'].initial = prep_for_form(dataset1)
+        form.fields['dataset2'].initial = prep_for_form(dataset2)
 
     else:
         # POST data submitted; process data.
+        request.POST._mutable = True
+        print(request.POST)
         form = DatasetsForm(data=request.POST)
         if form.is_valid():
             model_instance = form.save(commit=False)
@@ -41,35 +103,37 @@ def ttest(request):
             # Add here any changes before saving to database
             model_instance.save()
 
-        else:
+        else: # form not valid
             context = {'form': form }
             return render(request, 'core/ttest.html', context)
 
     try:
-        # Get descriptive statistics
-        data1 = get_stats(dataset1)
-        data2 = get_stats(dataset2)
 
-        # Sample with largest mean should be group 2, since alternate hypothesis: population 1 < population 2
-        if data1['mean'] > data2['mean']:
+        data1 = Data(dataset1)
+        data2 = Data(dataset2)
+        # Sample with largest mean will be group 2
+        if data1.mean > data2.mean:
             data1, data2 = data2, data1
+            form.data['dataset1'] = prep_for_form(data1.dataset)
+            form.data['dataset2'] = prep_for_form(data2.dataset)
 
         # Get inferential statistics
-        df = get_df(data1, data2) # degrees of freedom
+        df = get_pooled_df(data1, data2) # degrees of freedom
         t_value, p_value = get_t_and_p_value(data1, data2, df)
-        t_value_x = convert_t_to_x(t_value, data1)
+        t_value_x = data1.convert_t_to_x(t_value)
 
         # Define chart's x-axis range.
         x_min, x_max = get_x_axis_min_max(data1, data2)
-        # Get curve x,y values for plotting.
-        curve1, step_size1 = get_t_curve(data1, x_min, x_max)
-        curve2, step_size2 = get_t_curve(data2, x_min, x_max)
+        # Get distribution x,y values for plotting.
+        data1.create_t_dist(x_min, x_max)
+        data2.create_t_dist(x_min, x_max)
+
 
         # Configure the x-axis step size for a more visually appealing chart.
-        if step_size1 > step_size2:
-            step_size = step_size1
+        if data1.step_size > data2.step_size:
+            step_size = data1.step_size
         else:
-            step_size = step_size2
+            step_size = data2.step_size
 
         if step_size >= 1:  # If step_size > 1, eliminate decimal places.
             step_size = int(step_size)
@@ -77,14 +141,9 @@ def ttest(request):
             x_max = int(x_max)
 
         # Define chart's y-axis range: 0 to y_max. Multiply by arbitrary value to provide headspace.
-        y_max = 1.2 * get_y_axis_max(curve1, curve2)
+        y_max = 1.2 * get_y_axis_max(data1.dist, data2.dist)
 
-
-        data1.update({'t_curve': json.dumps(curve1)})
-        data2.update({'t_curve': json.dumps(curve2)})
-        test_results.update({"effect_size" : get_effect_size(data1, data2)})
-        test_results.update({"df" : df, "t_value" : t_value, "p_value" : p_value})
-        test_results.update({"t_value_x" : t_value_x})
+        test_results.update({"df" : df, "t_value" : t_value, "p_value" : p_value, "t_value_x" : t_value_x})
         test_results.update({"crit_t_init": st.norm.ppf(.95)})  # Arbitrary starting point (alpha=0.05), opposite is st.norm.cdf(1.64)
         axes.update({"x_min": x_min, "x_max": x_max, "y_max": y_max, "step_size": step_size})
 
@@ -93,7 +152,8 @@ def ttest(request):
         print(str(e))
 
 
-    context = { 'form': form, 'data1': data1, 'data2': data2,
+
+    context = { 'form': form, 'data1': data1.clean(), 'data2': data2.clean(),
                 'test_results': test_results, 'axes': json.dumps(axes),
               }
     return render(request, 'core/ttest.html', context)
@@ -102,76 +162,47 @@ def ttest(request):
 
 
 
-def get_stats(dataset):
-    return {
-        "dataset": dataset,
-        "mean": round(statistics.mean(dataset),DEC),
-        "sd": round(statistics.stdev(dataset),DEC),
-        "n": len(dataset)
-    }
 
 
-
-def get_t_curve(data, min, max):
-    """ Return x,y coordinates of t distribution. """
-    df = data['n']-1
-    step_size = (max - min) / 50   # 50 is an arbitrary number
-    x_list = [round(min + step_size*i, 6) for i in range(0, 50)]
-    try:
-        coords = []
-        for x in x_list:
-            t = (x-data['mean'])/(data['sd'])
-            y = round((math.gamma((df+1)/2)/(math.sqrt(df*math.pi)*math.gamma(df/2))) * (1+((t**2)/df))**(-(df+1)/2),DEC)
-            coords.append({'x': x, 'y': y})
-        return coords, round(step_size,DEC)
-
-    except Exception as e:
-        print(str(e))
-        return [], round(step_size,DEC)
-
-
-
-
-def convert_t_to_x(t, data):
-    return round(data['mean'] + (abs(t) * data['sd']), DEC)
-
-
-
-
-def get_df(data1, data2):
-    """ Get degrees of freedom """
-    v1 = data1['n'] - 1
-    v2 = data2['n'] - 1
-    df = (((data1['sd']**(2)/data1['n'])+(data2['sd']**(2)/data2['n']))**(2))/(((data1['sd']**(4)/(v1*data1['n']**(2))))+((data2['sd']**(4)/(v2*data2['n']**(2)))))
+def get_pooled_df(data1, data2):
+    # Get pooled degrees of freedom
+    v1 = data1.df
+    v2 = data2.df
+    df = (((data1.sd**(2)/data1.sd)+(data2.sd**(2)/data2.sd))**(2))/(((data1.sd**(4)/(v1*data1.sd**(2))))+((data2.sd**(4)/(v2*data2.sd**(2)))))
     return math.trunc(round(df,0))
 
 
 def get_t_and_p_value(data1, data2, df):
-    t = (data1['mean'] - data2['mean'])/math.sqrt((data1['sd']**(2)/data1['n'])+(data2['sd']**(2)/data2['n']))
+    t = (data1.mean - data2.mean)/math.sqrt((data1.sd**(2)/data1.n)+(data2.sd**(2)/data2.n))
     p_value = st.t.sf(np.abs(t), df)   # two-sided p_value = st.t.sf(np.abs(t), df) * 2
     return round(t,DEC), round(p_value,DEC)
 
 
-
-
 def get_x_axis_min_max(data1, data2):
+    # Each tail of each distribution will have at least 6 standard deviations represented visually.
     vals = []
-    vals.append(round(data1['mean'] - (6 * data1['sd']), 6))
-    vals.append(round(data1['mean'] + (6 * data1['sd']), 6))
-    vals.append(round(data2['mean'] - (6 * data1['sd']), 6))
-    vals.append(round(data2['mean'] + (6 * data1['sd']), 6))
+    vals.append(round(data1.mean - (6 * data1.sd), 6))
+    vals.append(round(data1.mean + (6 * data1.sd), 6))
+    vals.append(round(data2.mean - (6 * data2.sd), 6))
+    vals.append(round(data2.mean + (6 * data2.sd), 6))
     return min(vals), max(vals)
 
 
-
-def get_y_axis_max(dist_curve1, dist_curve2):
-    l1 = [coord.get('y') for coord in dist_curve1]
-    l2 = [coord.get('y') for coord in dist_curve2]
+def get_y_axis_max(dist_dist1, dist_dist2):
+    l1 = [coord.get('y') for coord in dist_dist1]
+    l2 = [coord.get('y') for coord in dist_dist2]
     return max(l1 + l2)
 
 
 
+def prep_for_form(num_list):
+    # Prep list for output in dataset form field
+    return str(num_list).replace(", ","\n").replace("[","").replace("]","")
+
+
 def clean_dataset(dataset):
+    # Some cleaning done at the model level. Additional cleaning
+    # may be performed here.
     dataset = dataset.splitlines()
     try:
         dataset = [float(data) for data in dataset]
@@ -181,28 +212,26 @@ def clean_dataset(dataset):
 
 
 
+
 # Functions below are not currently used.
-
-def get_normal_curve(data, min, max):
-    """ Return x,y coordinates of normal distribution. Useful for z-tests. """
-    print(data)
-    try:
-        coords = []
-        for x in range(min, max + 1):
-            y = round((1/(data['sd']*math.sqrt(2*math.pi)))*math.exp((-((x-data['mean']) ** 2))/(2*data['sd'] ** 2)),DEC)
-            coords.append({'x': x, 'y': y})
-        return coords
-    except Exception as e:
-        print(str(e))
-        return []
-
-
-def get_effect_size(data1, data2):
-    mean_difference = data1['mean'] - data2['mean']
-    num = ((data1['n'] - 1)*(data1['sd']**(2))) + ((data2['n'] - 1)*(data2['sd']**(2)))
-    den = data1['n'] + data2['n'] - 2
-    pooled_sd = math.sqrt(num/den)  # pooled sd
-    return round(abs(mean_difference / pooled_sd),DEC)
-
-  
-
+#
+# def get_normal_dist(data, min, max):
+#     """ Return x,y coordinates of normal distribution. Useful for z-tests. """
+#     print(data)
+#     try:
+#         coords = []
+#         for x in range(min, max + 1):
+#             y = round((1/(data.sd*math.sqrt(2*math.pi)))*math.exp((-((x-data.mean) ** 2))/(2*data.sd ** 2)),DEC)
+#             coords.append({'x': x, 'y': y})
+#         return coords
+#     except Exception as e:
+#         print(str(e))
+#         return []
+#
+#
+# def get_effect_size(data1, data2):
+#     mean_difference = data1.mean - data2.mean
+#     num = ((data1.n - 1)*(data1.sd**(2))) + ((data2.n - 1)*(data2.sd**(2)))
+#     den = data1.n + data2.n - 2
+#     pooled_sd = math.sqrt(num/den)  # pooled sd
+#     return round(abs(mean_difference / pooled_sd),DEC)
