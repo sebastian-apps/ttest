@@ -268,6 +268,8 @@ This calculator is for one-tailed Welch’s <i>t</i>-tests. The data are assumed
       <p><br><p><br>
       {% endif %}
 
+      <b><span id="message"></span></b>
+      <br>
 
       <div class="enter-data">
         <form id="data-form" action="{% url 'core:ttest' %}" method='post' class="form">
@@ -283,18 +285,17 @@ This calculator is for one-tailed Welch’s <i>t</i>-tests. The data are assumed
 
            <div class="col-xs-12 col-sm-4">
               <b>STATISTICS</b><br><br>
-              <b>x:</b> <span id="x_position"></span><br>
               <b>critical t:</b> <span id="crit_t_value"></span><br>
-              <b>level sig (&#945;):</b> <span id="level-of-sig"></span><br>
+              <b>sig level (&#945;):</b> <span id="sig-level"></span><br>
               <br>
 
-              <b>t-value_x:</b> {{ test_results.t_value_x }}<br>
-              <b>t-value:</b> {{ test_results.t_value }}<br>
+              <b>t-value:</b> <span id="t_value"></span><br>
               <b>p-value:</b> {{ test_results.p_value }}<br>
               <br>
 
               <b>df:</b> {{ test_results.df }}<br>
-              <!-- <b>effect size:</b> {{ test_results.effect_size }}<br> -->
+              <b>effect size:</b> {{ test_results.effect_size }}<br>
+              <b>ncp:</b> <span id="ncp"></span><br>
               <br><br>
 
               <button name="submit" style="margin-bottom:5px" class="btn btn-primary">Analyze</button>
@@ -327,8 +328,7 @@ This calculator is for one-tailed Welch’s <i>t</i>-tests. The data are assumed
   </div><!-- close enter-data div -->
 
 
-  <b><span id="message"></span></b>
-  <p><br>
+
 
 
   </div> <!-- column end -->
@@ -384,8 +384,8 @@ This calculator is for one-tailed Welch’s <i>t</i>-tests. The data are assumed
           <br><br>
           <div align='justify'>
           For example, if 1% of the population is afflicted with a disease, and
-          the test for the disease is 70% accurate, we may intuit that
-          our diagnosis will be correct 70% of the time. However, if &#945; = 0.05 and &#946; = 0.30, we will accurately diagnose a patient with the disease only 12% of the time. The PPV in this case is 12%.<sup>4</sup>
+          the test for the disease is 99% accurate, we may intuit that
+          our diagnosis will be correct 99% of the time. However, if &#945; = 0.05 and &#946; = 0.01, we will accurately diagnose a patient with the disease only 16% of the time. The PPV in this case is 16%.<sup>4</sup>
           <br><br>
           The probability of the real effect (e.g., prevalence of disease) can be modified below.
 
@@ -480,9 +480,7 @@ var beta;
 var newLeft;
 var df;
 var crit_t_value;
-var crit_t_value_x;
 var t_value;
-var t_value_x;
 var crit_t_value_beta;  // critical t with respect to the group 2 distribution, not group 1
 
 
@@ -495,8 +493,14 @@ var crit_t_value_beta;  // critical t with respect to the group 2 distribution, 
   console.log(axes);
 
   df = {{ test_results.df }};
-  t_value = {{ test_results.t_value }};
-  t_value_x = {{ test_results.t_value_x }};
+  ncp = {{ test_results.ncp }};
+  document.getElementById("ncp").innerText = round(ncp);
+
+  var t_value = {{ test_results.t_value }};
+  document.getElementById("t_value").innerText = round(t_value);  // display t-value, even as negative
+  t_value = math.abs(t_value);
+  document.getElementById("message").innerText = t_value;
+
 {% endif %}
 
 
@@ -605,7 +609,7 @@ var lineChart = new Chart(document.getElementById("line_chart"), {
         type: 'line',
         mode: 'vertical',
         scaleID: 'x-axis-1',
-        value: t_value_x,
+        value: t_value,
         borderColor: '#c8c8c8',
         borderWidth: 2,
         borderDash: [10,5],
@@ -620,7 +624,7 @@ var lineChart = new Chart(document.getElementById("line_chart"), {
         type: 'line',
         mode: 'vertical',
         scaleID: 'x-axis-1',
-        value: crit_t_value_x,
+        value: crit_t_value,
         borderColor: '#ff7034',
         borderWidth: 2,
         label: {
@@ -711,7 +715,7 @@ function init_thumb(chart_x_min, chart_x_max, thumbOffsetWidth){
   // Initial position of the slider thumb.
   // crit_t_init is an arbitrary initial critical t value
   var crit_t_init = {{ test_results.crit_t_init }};
-  var init_x = round(t_to_x(crit_t_init, group1.mean, group1.sd));
+  var init_x = crit_t_init;
 
   var points = lineChart.chart.getDatasetMeta(0).data;
   var x1 = points[0]._model.x;
@@ -752,29 +756,28 @@ function moveBar(){
   document.getElementById("slider").style.width = x2 - x1 + "px";
 
   // draw the critical t vertical line
-  crit_t_value_x = convert_screen_x_to_chart_x(newLeft, x1, x2, axes.x_min, axes.x_max, thumb.offsetWidth);
-  lineChart.options.annotation.annotations[1]['value'] = crit_t_value_x;
+  crit_t_value = round(convert_screen_x_to_chart_x(newLeft, x1, x2, axes.x_min, axes.x_max, thumb.offsetWidth));
+  lineChart.options.annotation.annotations[1]['value'] = crit_t_value;
   lineChart.update();
 
   // update numeric values related to critical t
-  crit_t_value = round((x_to_t(crit_t_value_x, group1.mean, group1.sd)));
-  crit_t_value_beta = round((x_to_t(crit_t_value_x, group2.mean, group2.sd)));
-  document.getElementById('x_position').innerText = round(crit_t_value_x);
+  crit_t_value_beta = crit_t_value - ncp;
+  //document.getElementById('message').innerText = "comp area: " + compute_area(3, df);
   document.getElementById('crit_t_value').innerText = crit_t_value;
 
   // fill in areas under the graph, find alpha and beta
   draw_alpha_curve();
   draw_beta_curve();
   get_probabilities();
-  document.getElementById('level-of-sig').innerText = round(alpha);
+  document.getElementById('sig-level').innerText = round(alpha);
 
   // determine recommendation: to reject or not reject the null hypothesis
-  if (crit_t_value_x <= t_value_x){
+  if (crit_t_value <= t_value){
     document.getElementById('reject-or-not').innerText = "Reject the Null Hypothesis (H\u2080)";
     document.getElementById('reject').style.backgroundColor = "#ff7034";
     document.getElementById('not-reject').style.backgroundColor = "#ffffff";
 
-  } else if (crit_t_value_x > t_value_x) {
+  } else if (crit_t_value > t_value) {
     document.getElementById('reject-or-not').innerText = "Do Not Reject the Null Hypothesis (H\u2080)";
     document.getElementById('reject').style.backgroundColor = "#ffffff";
     document.getElementById('not-reject').style.backgroundColor = "#ff7034";
@@ -790,12 +793,8 @@ function moveBar(){
 
 
 
-
-
-
-function t_distrib(x, dof, mean, sd){
+function t_distrib(t, dof){
   // For a given x, return the t distribution y value.
-  t = (x-mean)/sd;
   f = (math.gamma((dof+1)/2)/(math.sqrt(dof*math.pi)*math.gamma(dof/2))) * (1+((t**2)/dof))**(-(dof+1)/2);
   return math.round(f, 6);
 }
@@ -804,9 +803,9 @@ function t_distrib(x, dof, mean, sd){
 function draw_alpha_curve(){
   // Fill the area under the curve representing alpha.
   alpha_curve = [];
-  alpha_curve.push({x: crit_t_value_x, y: t_distrib(crit_t_value_x, group1.n-1, group1.mean, group1.sd)}); // this datapoint connects with the critical t vertical line
+  alpha_curve.push({x: crit_t_value, y: t_distrib(crit_t_value, group1.df)}); // this datapoint connects with the critical t vertical line
   for(var i = 0; i < group1.dist.length; i++) {
-    if (group1.dist[i]['x'] > crit_t_value_x){
+    if (group1.dist[i]['x'] > crit_t_value){
       alpha_curve.push({x: group1.dist[i]['x'], y: group1.dist[i]['y']});
     }
   }
@@ -819,11 +818,11 @@ function draw_beta_curve(){
   // Fill the area under the curve representing beta.
   beta_curve = [];
   for(var i = 0; i < group2.dist.length; i++) {
-    if (group2.dist[i]['x'] < crit_t_value_x){
+    if (group2.dist[i]['x'] < crit_t_value){
       beta_curve.push({x: group2.dist[i]['x'], y: group2.dist[i]['y']});
     }
   }
-  beta_curve.push({x: crit_t_value_x, y: t_distrib(crit_t_value_x, group2.n-1, group2.mean, group2.sd)}); // this datapoint connects with the critical t vertical line
+  beta_curve.push({x: crit_t_value, y: t_distrib(crit_t_value, group2.df)}); // this datapoint connects with the critical t vertical line
   lineChart.data.datasets[4]['data'] = beta_curve;
   lineChart.update();
 }
@@ -886,14 +885,6 @@ function updateProbabilityTree(){
 
 
 
-
-function x_to_t(x, mean, sd){
-  return (x - mean)/sd;
-}
-
-function t_to_x(t, mean, sd){
-  return (t * sd) + mean;
-}
 
 
 function round(val){
@@ -982,28 +973,28 @@ function compute_area(x, df) {
 }
 
 
-/*
-Functions below may be used at a future date.
+    /*
+    Functions below may be used at a future date.
 
 
-BELOW FOR NORMAL CURVE (Z-TEST)
-function error_f(x, mean, sd){
-  return (1/(sd*math.sqrt(2*math.pi)))*math.exp((-((x-mean) ** 2))/(2*sd ** 2));
-  //return (1/(sd*math.sqrt(2*math.pi)))*math.exp((-((x-mean)^2))/(2*sd^2));
-}
+    BELOW FOR NORMAL CURVE (Z-TEST)
+    function error_f(x, mean, sd){
+      return (1/(sd*math.sqrt(2*math.pi)))*math.exp((-((x-mean) ** 2))/(2*sd ** 2));
+      //return (1/(sd*math.sqrt(2*math.pi)))*math.exp((-((x-mean)^2))/(2*sd^2));
+    }
 
-function area_under_curve(x1, x2, mean, sd){
-  return -0.5*(math.erf((mean-x2)/(math.sqrt(2)*sd)) - math.erf((mean-x1)/(math.sqrt(2)*sd)));
-}
+    function area_under_curve(x1, x2, mean, sd){
+      return -0.5*(math.erf((mean-x2)/(math.sqrt(2)*sd)) - math.erf((mean-x1)/(math.sqrt(2)*sd)));
+    }
 
 
-const width  = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-if (width <= 1000){
-  lineChart.options.annotation.annotations[0].label['enabled'] = true;
-  lineChart.options.annotation.annotations[1].label['enabled'] = true;
-  lineChart.update();
-}
-*/
+    const width  = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+    if (width <= 1000){
+      lineChart.options.annotation.annotations[0].label['enabled'] = true;
+      lineChart.options.annotation.annotations[1].label['enabled'] = true;
+      lineChart.update();
+    }
+    */
 
 </script>
 
