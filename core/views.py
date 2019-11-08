@@ -10,10 +10,7 @@ import math
 import statistics
 from statsmodels.stats.power import  tt_ind_solve_power
 
-
 DEC = 4  # Round values to a constant number of decimal places.
-
-
 
 
 class Data:
@@ -36,9 +33,10 @@ class Data:
 
 
     def create_t_dist(self, min, max, ncp):
+
         """ Create x,y coordinates of t distribution for a given range. """
-        self.step_size = (max - min) / 200   # 200 is an arbitrary number
-        t_list = [round(min + self.step_size*i, 6) for i in range(0, 200)]
+        self.step_size = (max - min) / 50   # 50 is an arbitrary number
+        t_list = [round(min + self.step_size*i, 6) for i in range(0, 50)]
 
         try:
             coords = []
@@ -101,21 +99,12 @@ def ttest(request):
 
         else: # form not valid
             context = {'form': form }
-            return render(request, 'core/ttest.html', context)
+            return render(request, 'learning_logs/ttest.html', context)
 
     try:
 
         data1 = Data(dataset1)
         data2 = Data(dataset2)
-
-        # data1.mean = 5
-        # data1.sd = 15
-        # data1.n = 42
-        # data1.df = data1.n - 1
-        # data2.mean = 15
-        # data2.sd = 17
-        # data2.n = 42
-        # data2.df = data2.n - 1
 
         # Sample with largest mean will be group 2
         if data1.mean > data2.mean:
@@ -130,7 +119,7 @@ def ttest(request):
         effect_size, ncp = get_effect_size_ncp(data1, data2)
 
         # Define chart's x-axis range.
-        x_min, x_max = get_x_axis_min_max(data1, data2)
+        x_min, x_max = get_x_axis_min_max(data1, data2, ncp)
         # Get distribution x,y values for plotting.
         data1.create_t_dist(x_min, x_max, 0)
         data2.create_t_dist(x_min, x_max, ncp)
@@ -166,10 +155,12 @@ def ttest(request):
     context = { 'form': form, 'data1': data1.clean(), 'data2': data2.clean(),
                 'test_results': test_results, 'axes': json.dumps(axes),
               }
-    return render(request, 'core/ttest.html', context)
+    return render(request, 'learning_logs/ttest.html', context)
 
 
 
+def get_x_axis_min_max(data1, data2, ncp):
+    return -st.norm.ppf(.999999), ncp + st.norm.ppf(.999999)
 
 
 
@@ -205,16 +196,6 @@ def get_effect_size_ncp(data1, data2):
     return round(es, DEC), ncp
 
 
-
-
-def get_x_axis_min_max(data1, data2):
-    # Each tail of each distribution will have at least 2 * sd/sqrt(n) represented visually.
-    vals = []
-    vals.append(round(0 - (2 * data1.sd/(math.sqrt(data1.n))), 6))
-    vals.append(round(0 + (2 * data1.sd/(math.sqrt(data1.n))), 6))
-    vals.append(round(0 - (2 * data2.sd/(math.sqrt(data2.n))), 6))
-    vals.append(round(0 + (2 * data2.sd/(math.sqrt(data2.n))), 6))
-    return min(vals), max(vals)
 
 
 def get_y_axis_max(dist_dist1, dist_dist2):
@@ -264,3 +245,4 @@ def clean_dataset(dataset):
 #     den = data1.n + data2.n - 2
 #     pooled_sd = math.sqrt(num/den)  # pooled sd
 #     return round(abs(mean_difference / pooled_sd),DEC)
+
