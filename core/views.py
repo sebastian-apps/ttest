@@ -238,11 +238,4 @@ def clean_dataset(dataset):
 #         print(str(e))
 #         return []
 #
-#
-# def get_effect_size(data1, data2):
-#     mean_difference = data1.mean - data2.mean
-#     num = ((data1.n - 1)*(data1.sd**(2))) + ((data2.n - 1)*(data2.sd**(2)))
-#     den = data1.n + data2.n - 2
-#     pooled_sd = math.sqrt(num/den)  # pooled sd
-#     return round(abs(mean_difference / pooled_sd),DEC)
 
