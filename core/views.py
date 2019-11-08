@@ -99,7 +99,7 @@ def ttest(request):
 
         else: # form not valid
             context = {'form': form }
-            return render(request, 'learning_logs/ttest.html', context)
+            return render(request, 'core/ttest.html', context)
 
     try:
 
@@ -155,7 +155,7 @@ def ttest(request):
     context = { 'form': form, 'data1': data1.clean(), 'data2': data2.clean(),
                 'test_results': test_results, 'axes': json.dumps(axes),
               }
-    return render(request, 'learning_logs/ttest.html', context)
+    return render(request, 'core/ttest.html', context)
 
 
 
