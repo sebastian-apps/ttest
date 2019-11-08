@@ -326,7 +326,7 @@ This calculator is for one-tailed Welch’s <i>t</i>-tests. The data are assumed
           </div>
         </div>
   </div><!-- close enter-data div -->
-
+<p><br>
 
 
 
@@ -499,7 +499,6 @@ var crit_t_value_beta;  // critical t with respect to the group 2 distribution, 
   var t_value = {{ test_results.t_value }};
   document.getElementById("t_value").innerText = round(t_value);  // display t-value, even as negative
   t_value = math.abs(t_value);
-  document.getElementById("message").innerText = t_value;
 
 {% endif %}
 
@@ -722,7 +721,7 @@ function init_thumb(chart_x_min, chart_x_max, thumbOffsetWidth){
   var x2 = points[1]._model.x;
 
   // convert chart x value to the x screen position for the slider thumb
-  var magic_number = 5; // better implementation needed
+  var magic_number = 3; // better implementation needed
   var new_thumb = convert_chart_x_to_screen_x(init_x, chart_x_min, chart_x_max, x1, x2, magic_number);
   document.getElementById("thumb").style.left = new_thumb +"px";
   return new_thumb;
@@ -803,7 +802,8 @@ function t_distrib(t, dof){
 function draw_alpha_curve(){
   // Fill the area under the curve representing alpha.
   alpha_curve = [];
-  alpha_curve.push({x: crit_t_value, y: t_distrib(crit_t_value, group1.df)}); // this datapoint connects with the critical t vertical line
+  // this datapoint connects with the critical t vertical line
+  alpha_curve.push({x: crit_t_value, y: t_distrib(crit_t_value, group1.df)});
   for(var i = 0; i < group1.dist.length; i++) {
     if (group1.dist[i]['x'] > crit_t_value){
       alpha_curve.push({x: group1.dist[i]['x'], y: group1.dist[i]['y']});
@@ -822,7 +822,8 @@ function draw_beta_curve(){
       beta_curve.push({x: group2.dist[i]['x'], y: group2.dist[i]['y']});
     }
   }
-  beta_curve.push({x: crit_t_value, y: t_distrib(crit_t_value, group2.df)}); // this datapoint connects with the critical t vertical line
+  // this datapoint connects with the critical t vertical line
+  beta_curve.push({x: crit_t_value, y: t_distrib(crit_t_value-ncp, group2.df)}); // ncp acts as offset
   lineChart.data.datasets[4]['data'] = beta_curve;
   lineChart.update();
 }
