@@ -1,26 +1,44 @@
-{% extends "core/base.html" %}
 {% load bootstrap3 %}
 
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/prefixfree/1.0.6/prefixfree.min.js"></script>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA Compatible" content="IE-edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Welch's t-test calculator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.min.js"></script>
+    <script src="https://cdn.rawgit.com/chartjs/chartjs-plugin-annotation/master/chartjs-plugin-annotation.min.js"></script>
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prefixfree/1.0.6/prefixfree.min.js"></script>
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+    {% load crispy_forms_tags %}
+    {% load static %}
+</head>
+<body>
 
-{% bootstrap_css %}
-{% bootstrap_javascript %}
-{% load crispy_forms_tags %}
 
-{% load static %}
-
-{% block header %}
-  <h3>Welch's <i>t</i>-test calculator</h3>
-{% endblock header %}
-
-
-{% block content %}
 <script src="https://unpkg.com/mathjs/dist/math.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prefixfree/1.0.6/prefixfree.min.js"></script>
 
 
 <style>
+
+
+.orange-back {
+  background-color: #ff7034;
+  padding: 12px;
+}
+
+.grey-back {
+  border-radius: 20px;
+  background-color: #e8e8e8;
+  padding:20px;
+}
+
 
 
 .header_box {
@@ -75,64 +93,64 @@
 }
 
 /* Probability of Real Effect */
-.prob1 {
+.prob1_re {
   position: absolute;
   top: 33%;
   left: 5%;
   border: 1px solid #ff7034;
 }
 /* Probability of No Effect */
-.prob2 {
+.prob2_ne {
   position: absolute;
   top: 65%;
   left: 5%;
 }
 /* Probability of True Positive */
-.prob3 {
+.prob3_tp {
   position: absolute;
   top: 20%;
   left: 47%;
 }
 /* Probability of False Negative */
-.prob4 {
+.prob4_fn {
   position: absolute;
   top: 40%;
   left: 47%;
   color: blue;
 }
 /* Probability of True Negative  */
-.prob5 {
+.prob5_tn {
   position: absolute;
   top: 60%;
   left: 47%;
 }
 /* Probability of False Positive*/
-.prob6 {
+.prob6_fp {
   position: absolute;
   top: 80%;
   left: 47%;
   color: red;
 }
 /* Probability of Real Effect x True Positive */
-.prob7 {
+.prob7_retp {
   position: absolute;
   top: 20%;
   left: 82%;
 }
 /* Probability of Real Effect x False Negative */
-.prob8 {
+.prob8_refn {
   position: absolute;
   top: 40%;
   left: 82%;
 }
 /* Probability of No Effect x True Negative */
-.prob9 {
+.prob9_netn {
   position: absolute;
   top: 60%;
   left: 82%;
 }
 /* Probability of No Effect x False Positive */
-.prob10 {
+.prob10_nefp {
   position: absolute;
   top: 80%;
   left: 82%;
@@ -235,10 +253,16 @@
     }
 }
 
+body {
+  background-color: #ff7034;
+}
+
+.more-info {
+  padding: 10px 20px 20px 20px;
+  border: 2px solid #ff7034;
+}
+
 </style>
-
-
-
 
 <noscript>
 <div class="disabled">
@@ -246,13 +270,26 @@ Javascript is disabled in your web browser. Please enable JavaScript to view.</d
 </noscript>
 
 
-<div align='justify'>
-Observe the impact of the level of significance on the probabilities for type I and type II errors by using the slider. Also, input and explore your own datasets.
-This calculator is for one-tailed Welch’s <i>t</i>-tests. The data are assumed to be normally distributed.
-<a href='#more-info'>Find more information.</a></div>
-<hr><p><br>
+<div class="orange-back">
+  <div class="container" style="margin-bottom:-120px">
+    <font color="white">
+  <h1>Welch's <i>t</i>-test calculator</h1></font>
+  </div>
+</div>
+<br><br>
 
 
+  <div class="container" style="background-color: #fff; padding: 50px">
+    <div class="grey-back">
+    <div align='justify'>
+    Observe the impact of the level of significance on the probabilities for type I and type II errors and the PPV by using the slider. Also, input and explore your own datasets.
+    This calculator is for one-tailed Welch’s <i>t</i>-tests. The data are assumed to be normally distributed.
+    <a href='#more-info'>Find more information.</a></div>
+
+  </div>
+
+
+<p><br><br><br>
 
 <div class="row">
 
@@ -396,17 +433,17 @@ This calculator is for one-tailed Welch’s <i>t</i>-tests. The data are assumed
 
             <div class="diagram-box">
               <div class="responsive">
-              <img class="responsive" src="{% static 'tree.svg' %}">
-              <input id="prob1" class="prob1" value="0.01" size="3">
-           <b><div id="prob2" class="prob2"></div>
-              <div id="prob3" class="prob3"></div>
-              <div id="prob4" class="prob4"></div>
-              <div id="prob5" class="prob5"></div>
-              <div id="prob6" class="prob6"></div>
-              <div id="prob7" class="prob7"></div>
-              <div id="prob8" class="prob8"></div>
-              <div id="prob9" class="prob9"></div>
-              <div id="prob10" class="prob10"></div></b>
+              <img class="responsive" src="/core/static/tree.svg">
+              <input id="prob1_re" class="prob1_re" value="0.01" size="3">
+           <b><div id="prob2_ne" class="prob2_ne"></div>
+              <div id="prob3_tp" class="prob3_tp"></div>
+              <div id="prob4_fn" class="prob4_fn"></div>
+              <div id="prob5_tn" class="prob5_tn"></div>
+              <div id="prob6_fp" class="prob6_fp"></div>
+              <div id="prob7_retp" class="prob7_retp"></div>
+              <div id="prob8_refn" class="prob8_refn"></div>
+              <div id="prob9_netn" class="prob9_netn"></div>
+              <div id="prob10_nefp" class="prob10_nefp"></div></b>
               </div>
             </div>
             <p><br>
@@ -425,37 +462,33 @@ This calculator is for one-tailed Welch’s <i>t</i>-tests. The data are assumed
 
 <div id="SmallScreen" style="height: 1200px;">  <!-- buffer space for small screens -->
 </div>
+<br><br><br>
 
-<hr>
-<a name="more-info"></a>
-<h4>More information</h4>
 
-The Welch’s <i>t</i>-test, or unequal variances <i>t</i>-test, can test hypotheses such as whether the means of two independent normally-distributed populations are equal. While the commonly-used Student <i>t</i>-test requires that the two samples share equal variances and equal sample sizes, the Welch’s <i>t</i>-test does not have this requirement. Researchers argue that the Welch’s <i>t</i>-test is more versatile and should instead be used by default.<sup>1,2</sup>
-<br><br>
-Statistical rigor can be achieved with <i>t</i>-tests, yet the level of significance is set arbitrarily. While lowering significance levels mitigates false positives (&#945;), the probability of false negatives (&#946;) increases, and tests may fail to detect existing effects.<sup>3</sup>
 
-<br><br>
-<h4>References</h4>
+  <div class="more-info">
+    <a name="more-info"></a>
+    <h4>More information</h4>
 
-1. Dahiru, T. P-value, a true test of statistical significance? A cautionary note. <i>Annals of Ibadan Postgraduate Medicine.</i> 2008, <i>6</i>(1): 21–26.
+    The Welch’s <i>t</i>-test, or unequal variances <i>t</i>-test, can test hypotheses such as whether the means of two independent normally-distributed populations are equal. While the commonly-used Student <i>t</i>-test requires that the two samples share equal variances and equal sample sizes, the Welch’s <i>t</i>-test does not have this requirement. Researchers argue that the Welch’s <i>t</i>-test is more versatile and should instead be used by default.<sup>1,2</sup>
+    <br><br>
+    Statistical rigor can be achieved with <i>t</i>-tests, yet the level of significance is set arbitrarily. While lowering significance levels mitigates false positives (&#945;), the probability of false negatives (&#946;) increases, and tests may fail to detect existing effects.<sup>3</sup>
+  </div>
+  <br>
+
+  <div class="grey-back">
+    <h4>References</h4>
+
+    1. Dahiru, T. P-value, a true test of statistical significance? A cautionary note. <i>Annals of Ibadan Postgraduate Medicine.</i> 2008, <i>6</i>(1): 21–26.
+    <br>
+    2. Delacre, M.; Lakens, D.; Leys, C. Why Psychologists Should by Default Use Welch’s t-test Instead of Student’s t-test. <i>International Review of Social Psychology.</i> 2017, <i>30</i>(1), 92–101.
+    <br>
+    3. Benjamin, D.J.; Berger, J.O.; Johannesson, M. et al. Redefine statistical significance. <i>Nature Human Behaviour.</i> 2018, <i>2</i>, 6–10.
+    <br>
+    4. Colquhoun, D. An investigation of the false discovery rate and the misinterpretation of p-values. <i>Royal Society Open Science.</i> 2014, <i>1</i>(3): 140216.
+  </div>
+</div>  <!-- container -->
 <br>
-2. Delacre, M.; Lakens, D.; Leys, C. Why Psychologists Should by Default Use Welch’s t-test Instead of Student’s t-test. <i>International Review of Social Psychology.</i> 2017, <i>30</i>(1), 92–101.
-<br>
-3. Benjamin, D.J.; Berger, J.O.; Johannesson, M. et al. Redefine statistical significance. <i>Nature Human Behaviour.</i> 2018, <i>2</i>, 6–10.
-<br>
-4. Colquhoun, D. An investigation of the false discovery rate and the misinterpretation of p-values. <i>Royal Society Open Science.</i> 2014, <i>1</i>(3): 140216.
-
-<hr>
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -503,16 +536,16 @@ var crit_t_value_beta;  // critical t with respect to the group 2 distribution, 
 {% endif %}
 
 
-prob1 = document.getElementById("prob1");
-prob2 = document.getElementById("prob2");
-prob3 = document.getElementById("prob3");
-prob4 = document.getElementById("prob4");
-prob5 = document.getElementById("prob5");
-prob6 = document.getElementById("prob6");
-prob7 = document.getElementById("prob7");
-prob8 = document.getElementById("prob8");
-prob9 = document.getElementById("prob9");
-prob10 = document.getElementById("prob10");
+prob1_re = document.getElementById("prob1_re");
+prob2_ne = document.getElementById("prob2_ne");
+prob3_tp = document.getElementById("prob3_tp");
+prob4_fn = document.getElementById("prob4_fn");
+prob5_tn = document.getElementById("prob5_tn");
+prob6_fp = document.getElementById("prob6_fp");
+prob7_retp = document.getElementById("prob7_retp");
+prob8_refn = document.getElementById("prob8_refn");
+prob9_netn = document.getElementById("prob9_netn");
+prob10_nefp = document.getElementById("prob10_nefp");
 
 
 
@@ -585,7 +618,7 @@ var lineChart = new Chart(document.getElementById("line_chart"), {
         },
         scaleLabel: {
           display: true,
-          labelString: 'Number'
+          labelString: 't'
         }
       }],
       yAxes: [{
@@ -854,19 +887,19 @@ function get_probabilities(){
 
 function updateProbabilityTree(){
 
-  if ((prob1.value >= 0) && (prob1.value <= 1)) {
-    prob2.innerText = round(1 - prob1.value);
-    prob3.innerText = round(1 - beta);
-    prob4.innerText = round(beta);
-    prob5.innerText = round(1 - alpha);
-    prob6.innerText = round(alpha);
-    prob7.innerText = round(prob1.value * prob3.innerText);
-    prob8.innerText = round(prob1.value * prob4.innerText);
-    prob9.innerText = round(prob2.innerText * prob5.innerText);
-    prob10.innerText = round(prob2.innerText * prob6.innerText);
+  if ((prob1_re.value >= 0) && (prob1_re.value <= 1)) {
+    prob2_ne.innerText = round(1 - prob1_re.value);
+    prob3_tp.innerText = round(1 - beta);
+    prob4_fn.innerText = round(beta);
+    prob5_tn.innerText = round(1 - alpha);
+    prob6_fp.innerText = round(alpha);
+    prob7_retp.innerText = round(prob1_re.value * prob3_tp.innerText);
+    prob8_refn.innerText = round(prob1_re.value * prob4_fn.innerText);
+    prob9_netn.innerText = round(prob2_ne.innerText * prob5_tn.innerText);
+    prob10_nefp.innerText = round(prob2_ne.innerText * prob6_fp.innerText);
 
     // Calculate the False Discovery Rate (FDR)
-    var fdr = math.round(parseFloat(prob10.innerText)*100/(parseFloat(prob10.innerText) + parseFloat(prob7.innerText)),2);
+    var fdr = math.round(parseFloat(prob10_nefp.innerText)*100/(parseFloat(prob10_nefp.innerText) + parseFloat(prob7_retp.innerText)),2);
     // Calculate the Positive Predictive Value (PPV)
     var ppv = math.round(100 - fdr,2);
 
@@ -879,8 +912,8 @@ function updateProbabilityTree(){
 
     document.getElementById("false_rate").innerText = fdr + "%";
     document.getElementById("ppv").innerText = ppv + "%";
-    document.getElementById("sensitivity").innerText = prob3.innerText;
-    document.getElementById("specificity").innerText = prob5.innerText;
+    document.getElementById("sensitivity").innerText = prob3_tp.innerText;
+    document.getElementById("specificity").innerText = prob5_tn.innerText;
   }
 }
 
@@ -899,7 +932,7 @@ function clear_form() {
 }
 
 
-document.getElementById("prob1").onkeypress = function(event){
+document.getElementById("prob1_re").onkeypress = function(event){
     if (event.keyCode == 13 || event.which == 13){
         updateProbabilityTree();
     }
@@ -999,4 +1032,5 @@ function compute_area(x, df) {
 </script>
 
 
-{% endblock content %}
+</body>
+</html>
