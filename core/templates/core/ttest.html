@@ -246,12 +246,25 @@
    display: none;
 }
 
+#MainWindow{
+  background-color: #fff;
+  padding: 50px;
+}
+
 /* show for small screens */
 @media screen and (max-width: 1000px) {
     #SmallScreen {
         display: block;
     }
 }
+
+/* remove padding on smaller screens */
+@media screen and (max-width: 500px) {
+  #MainWindow{
+    padding: 50px 0px 0px 0px;
+  }
+}
+
 
 body {
   background-color: #ff7034;
@@ -261,6 +274,8 @@ body {
   padding: 10px 20px 20px 20px;
   border: 2px solid #ff7034;
 }
+
+
 
 </style>
 
@@ -279,7 +294,7 @@ Javascript is disabled in your web browser. Please enable JavaScript to view.</d
 <br><br>
 
 
-  <div class="container" style="background-color: #fff; padding: 50px">
+  <div class="container" id="MainWindow">
     <div class="grey-back">
     <div align='justify'>
     Observe the impact of the level of significance on the probabilities for type I and type II errors and the PPV by using the slider. Input and explore your datasets.
@@ -465,9 +480,8 @@ Javascript is disabled in your web browser. Please enable JavaScript to view.</d
 <br><br><br>
 
 
-
+  <a name="more-info"></a>
   <div class="more-info">
-    <a name="more-info"></a>
     <h4>More information</h4>
 
     The Welch’s <i>t</i>-test, or unequal variances <i>t</i>-test, can test hypotheses such as whether the means of two independent normally-distributed populations are equal. While the commonly-used Student <i>t</i>-test requires that the two samples share equal variances and equal sample sizes, the Welch’s <i>t</i>-test does not have this requirement. Researchers argue that the Welch’s <i>t</i>-test is more versatile and should instead be used by default.<sup>1,2</sup>
@@ -527,29 +541,29 @@ var crit_t_value_beta;  // critical t with respect to the group 2 distribution, 
 
   df = {{ test_results.df }};
   ncp = {{ test_results.ncp }};
-  document.getElementById("ncp").innerText = round(ncp);
+  elem("ncp").innerText = round(ncp);
 
   var t_value = {{ test_results.t_value }};
-  document.getElementById("t_value").innerText = round(t_value);  // display t-value, even as negative
+  elem("t_value").innerText = round(t_value);  // display t-value, even as negative
   t_value = math.abs(t_value);
 
 {% endif %}
 
 
-prob1_re = document.getElementById("prob1_re");
-prob2_ne = document.getElementById("prob2_ne");
-prob3_tp = document.getElementById("prob3_tp");
-prob4_fn = document.getElementById("prob4_fn");
-prob5_tn = document.getElementById("prob5_tn");
-prob6_fp = document.getElementById("prob6_fp");
-prob7_retp = document.getElementById("prob7_retp");
-prob8_refn = document.getElementById("prob8_refn");
-prob9_netn = document.getElementById("prob9_netn");
-prob10_nefp = document.getElementById("prob10_nefp");
+prob1_re = elem("prob1_re");
+prob2_ne = elem("prob2_ne");
+prob3_tp = elem("prob3_tp");
+prob4_fn = elem("prob4_fn");
+prob5_tn = elem("prob5_tn");
+prob6_fp = elem("prob6_fp");
+prob7_retp = elem("prob7_retp");
+prob8_refn = elem("prob8_refn");
+prob9_netn = elem("prob9_netn");
+prob10_nefp = elem("prob10_nefp");
 
 
 
-var lineChart = new Chart(document.getElementById("line_chart"), {
+var lineChart = new Chart(elem("line_chart"), {
   type: 'scatter',
   data: {
     datasets: [{
@@ -756,7 +770,7 @@ function init_thumb(chart_x_min, chart_x_max, thumbOffsetWidth){
   // convert chart x value to the x screen position for the slider thumb
   var magic_number = 3; // better implementation needed
   var new_thumb = convert_chart_x_to_screen_x(init_x, chart_x_min, chart_x_max, x1, x2, magic_number);
-  document.getElementById("thumb").style.left = new_thumb +"px";
+  elem("thumb").style.left = new_thumb +"px";
   return new_thumb;
 }
 
@@ -784,40 +798,41 @@ function moveBar(){
   var y2 = points[1]._model.y;
 
   // adjust the slider
-  document.getElementById("slider").style.left = x1 + "px";
-  document.getElementById("slider").style.width = x2 - x1 + "px";
+  elem("slider").style.left = x1 + "px";
+  elem("slider").style.width = x2 - x1 + "px";
 
   // draw the critical t vertical line
   crit_t_value = round(convert_screen_x_to_chart_x(newLeft, x1, x2, axes.x_min, axes.x_max, thumb.offsetWidth));
   lineChart.options.annotation.annotations[1]['value'] = crit_t_value;
   lineChart.update();
 
-  // update numeric values related to critical t
+  /* update numeric values related to critical t.
+     shift by the non-centrality parameter. */
   crit_t_value_beta = crit_t_value - ncp;
-  //document.getElementById('message').innerText = "comp area: " + compute_area(3, df);
-  document.getElementById('crit_t_value').innerText = crit_t_value;
+  //elem('message').innerText = "comp area: " + compute_area(3, df);
+  elem('crit_t_value').innerText = crit_t_value;
 
   // fill in areas under the graph, find alpha and beta
   draw_alpha_curve();
   draw_beta_curve();
   get_probabilities();
-  document.getElementById('sig-level').innerText = round(alpha);
+  elem('sig-level').innerText = round(alpha);
 
   // determine recommendation: to reject or not reject the null hypothesis
   if (crit_t_value <= t_value){
-    document.getElementById('reject-or-not').innerText = "Reject the Null Hypothesis (H\u2080)";
-    document.getElementById('reject').style.backgroundColor = "#ff7034";
-    document.getElementById('not-reject').style.backgroundColor = "#ffffff";
+    elem('reject-or-not').innerText = "Reject the Null Hypothesis (H\u2080)";
+    elem('reject').style.backgroundColor = "#ff7034";
+    elem('not-reject').style.backgroundColor = "#ffffff";
 
   } else if (crit_t_value > t_value) {
-    document.getElementById('reject-or-not').innerText = "Do Not Reject the Null Hypothesis (H\u2080)";
-    document.getElementById('reject').style.backgroundColor = "#ffffff";
-    document.getElementById('not-reject').style.backgroundColor = "#ff7034";
+    elem('reject-or-not').innerText = "Do Not Reject the Null Hypothesis (H\u2080)";
+    elem('reject').style.backgroundColor = "#ffffff";
+    elem('not-reject').style.backgroundColor = "#ff7034";
 
   } else {
-    document.getElementById('reject-or-not').innerText = " ";
-    document.getElementById('reject').style.backgroundColor = "#ffffff";
-    document.getElementById('not-reject').style.backgroundColor = "#ffffff";
+    elem('reject-or-not').innerText = " ";
+    elem('reject').style.backgroundColor = "#ffffff";
+    elem('not-reject').style.backgroundColor = "#ffffff";
   }
 
   updateProbabilityTree();
@@ -868,17 +883,17 @@ function get_probabilities(){
   alpha = 1 - compute_area(crit_t_value, df);
   beta = compute_area(crit_t_value_beta, df);
 
-  document.getElementById("alpha").innerText = round(alpha);
-  document.getElementById("confidence").innerText = round(1-alpha);
-  document.getElementById("beta").innerText = round(beta);
-  document.getElementById("power").innerText = round(1-beta);
+  elem("alpha").innerText = round(alpha);
+  elem("confidence").innerText = round(1-alpha);
+  elem("beta").innerText = round(beta);
+  elem("power").innerText = round(1-beta);
 
   lineChart.options.annotation.annotations[1].label['content'] = '\u03B1 = ' + round(alpha);
   lineChart.update();
 
   // Option to have Hypothesis Testing boxes change color intensity according to magnitude of alpha and beta probability
-  //document.getElementById('alpha-box').style = "background-color: rgba(255, 0, 0, "+ (Math.round(alpha * 1000)*0.6 / (1000)).toFixed(3) +");"
-  //document.getElementById('beta-box').style = "background-color: rgba(0, 0, 255, "+ (Math.round(beta * 1000)*0.6 / (1000)).toFixed(3) +");"
+  //elem('alpha-box').style = "background-color: rgba(255, 0, 0, "+ (Math.round(alpha * 1000)*0.6 / (1000)).toFixed(3) +");"
+  //elem('beta-box').style = "background-color: rgba(0, 0, 255, "+ (Math.round(beta * 1000)*0.6 / (1000)).toFixed(3) +");"
 }
 
 
@@ -910,10 +925,10 @@ function updateProbabilityTree(){
       ppv = " - ";
     }
 
-    document.getElementById("false_rate").innerText = fdr + "%";
-    document.getElementById("ppv").innerText = ppv + "%";
-    document.getElementById("sensitivity").innerText = prob3_tp.innerText;
-    document.getElementById("specificity").innerText = prob5_tn.innerText;
+    elem("false_rate").innerText = fdr + "%";
+    elem("ppv").innerText = ppv + "%";
+    elem("sensitivity").innerText = prob3_tp.innerText;
+    elem("specificity").innerText = prob5_tn.innerText;
   }
 }
 
@@ -927,12 +942,12 @@ function round(val){
 
 
 function clear_form() {
-  document.getElementById("id_dataset1").value = '';
-  document.getElementById("id_dataset2").value = '';
+  elem("id_dataset1").value = '';
+  elem("id_dataset2").value = '';
 }
 
 
-document.getElementById("prob1_re").onkeypress = function(event){
+elem("prob1_re").onkeypress = function(event){
     if (event.keyCode == 13 || event.which == 13){
         updateProbabilityTree();
     }
@@ -943,6 +958,11 @@ $(window).resize(function(e) {
   moveBar();
 });
 
+
+// function is shorthand for getting element id
+function elem(elem_id){
+  return document.getElementById(elem_id);
+}
 
 
 function LogGamma(Z) {
