@@ -10,12 +10,23 @@ Clone the repository.
 git clone https://github.com/sebastian-apps/ttest.git
 ```
 
-Create and activate the virtual environment.
+Create the virtual environment.
 
 ```
 cd ttest
-python -m venv tt_env
-source tt_env/bin/activate
+python -m venv ttest_env
+```
+
+Activate the virtual environment <i>for OSX</i>.
+
+```
+source ttest_env/bin/activate
+```
+
+Activate the virtual environment <i>for Windows</i>.
+
+```
+ttest_env\Scripts\activate
 ```
 
 Install dependencies.
