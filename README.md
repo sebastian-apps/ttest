@@ -2,7 +2,7 @@
 
 Is there a statistically significant difference between two datasets? Move the slider and observe the impact of the significance level on the probability of making the wrong decision. Input and explore your datasets.
 
-Welch's t-test can also be used for evaluating binary classifiers, which are used in medical testing and machine learning. Binary classifiers distinguish between two states such as cancer is "detected" and "not detected", or the flight is "delayed" and "not delayed".
+Welch's t-test can also be used for evaluating binary classifiers, which are used in medical testing and machine learning. Binary classifiers distinguish between two states such as cancer is "detected" and "not detected", or the flight will be "delayed" and "not delayed".
 
 <br />
 
