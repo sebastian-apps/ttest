@@ -33,7 +33,7 @@ Activate the virtual environment <i>for Windows</i>.
 ttest_env\Scripts\activate
 ```
 
-Install dependencies.
+Install dependencies. Works best with Python 3.7.7.
 
 ```bash
 pip install -r requirements.txt
