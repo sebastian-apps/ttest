@@ -18,10 +18,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # SECURITY WARNING: keep the secret key used in production secret!
 # Read secret key from a file
-with open('k.txt') as f:
-    SECRET_KEY = f.read().strip()
-
-# SECRET_KEY = 'secret key'
+# with open('k.txt') as f:
+#     SECRET_KEY = f.read().strip()
+SECRET_KEY = 'secret key' 
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
