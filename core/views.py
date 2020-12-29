@@ -137,7 +137,8 @@ def ttest(request):
             x_max = int(x_max)
 
         # Define chart's y-axis range: 0 to y_max. Multiply by arbitrary value to provide headspace.
-        y_max = 1.2 * get_y_axis_max(data1.dist, data2.dist)
+        y_max = round(1.2 * get_y_axis_max(data1.dist, data2.dist), 1)
+
 
         test_results.update({"df" : df, "p_value" : p_value, "t_value" : t_value,
                              "effect_size": effect_size, "ncp" : ncp
@@ -238,4 +239,3 @@ def clean_dataset(dataset):
 #         print(str(e))
 #         return []
 #
-

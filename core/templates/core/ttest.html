@@ -8,44 +8,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Welch's t-test calculator</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.min.js"></script>
-    <script src="https://cdn.rawgit.com/chartjs/chartjs-plugin-annotation/master/chartjs-plugin-annotation.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/0.5.7/chartjs-plugin-annotation.min.js"></script>
+    <!-- <script src="https://cdn.rawgit.com/chartjs/chartjs-plugin-annotation/master/chartjs-plugin-annotation.min.js"></script> -->
     {% bootstrap_css %}
     {% bootstrap_javascript %}
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prefixfree/1.0.6/prefixfree.min.js"></script>
-    {% bootstrap_css %}
-    {% bootstrap_javascript %}
     {% load crispy_forms_tags %}
     {% load static %}
 </head>
 <body>
 
 
-<script src="https://unpkg.com/mathjs/dist/math.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/8.1.0/math.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prefixfree/1.0.6/prefixfree.min.js"></script>
 
 
 <style>
-
-
-.orange-back {
-  background-color: #ff7034;
-  padding: 12px;
-}
-
-.grey-back {
-  border-radius: 20px;
-  background-color: #e8e8e8;
-  padding:20px;
-}
-
-
-
-.header_box {
-  background-color: #F5F5F5;
-  border: 2px solid #585858;
-  border-radius: 15px;
-}
 
 .box {
   border: 2px solid #e8e8e8;
@@ -124,7 +103,7 @@
   top: 60%;
   left: 47%;
 }
-/* Probability of False Positive*/
+/* Probability of False Positive */
 .prob6_fp {
   position: absolute;
   top: 80%;
@@ -156,7 +135,6 @@
   left: 82%;
 }
 
-
 @import "compass/css3";
 
 
@@ -170,8 +148,8 @@
 }
 
 .tabbed {
-//  width: 700px;
-//  margin: 50px auto;
+/*  width: 700px;
+  margin: 50px auto;  */
 }
 
 .tabbed > input {
@@ -246,7 +224,7 @@
    display: none;
 }
 
-#MainWindow{
+#ContainerWindow{
   background-color: #fff;
   padding: 50px;
 }
@@ -260,21 +238,30 @@
 
 /* remove padding on smaller screens */
 @media screen and (max-width: 500px) {
-  #MainWindow{
+  #ContainerWindow{
     padding: 50px 5px 50px 5px;
   }
 }
 
-
 body {
   background-color: #ff7034;
+}
+
+.orange-back {
+  background-color: #ff7034;
+  padding: 12px;
+}
+
+.grey-back {
+  border-radius: 20px;
+  background-color: #e8e8e8;
+  padding:20px;
 }
 
 .more-info {
   padding: 10px 20px 20px 20px;
   border: 2px solid #ff7034;
 }
-
 
 
 </style>
@@ -294,26 +281,24 @@ Javascript is disabled in your web browser. Please enable JavaScript to view.</d
 <br><br>
 
 
-  <div class="container" id="MainWindow">
-    <div class="grey-back">
+<div class="container" id="ContainerWindow">
+  <div class="grey-back">
     <div align='justify'>
-    Observe the impact of the level of significance on the probabilities for type I and type II errors and the PPV by using the slider. Input and explore your datasets.
-    This calculator is for one-tailed Welch’s <i>t</i>-tests. The data are assumed to be normally distributed.
-    <a href='#more-info'>Find more information.</a></div>
-
+      Is there a statistically significant difference between two datasets? Move the slider and observe the impact of the significance level on the probability of making the wrong decision. Input and explore your datasets.
+      This calculator is for one-tailed Welch’s <i>t</i>-tests. The data are assumed to be normally distributed.
+      <a href='#more-info'>Find more information.</a>
+    </div>
   </div>
+  <p><br><br><br>
 
 
-<p><br><br><br>
-
-<div class="row">
-
+  <div class="row">
     <div class="col-md-6">
+
       {% if test_results %}
       <div id="slider" class="slider">
         <div id="thumb" class="thumb" ontouchmove="move_thumb_mobile(event)"></div>
       </div>
-
       <div>
         <canvas id="line_chart" width="1000" height="800"></canvas>
       </div>
@@ -329,10 +314,10 @@ Javascript is disabled in your web browser. Please enable JavaScript to view.</d
 
         <div class="row">
           	<div class="col-xs-6 col-sm-4">
-          	{{ form.dataset1|as_crispy_field }}
+          	   {{ form.dataset1|as_crispy_field }}
           	</div>
           	<div class="col-xs-6 col-sm-4">
-          	{{ form.dataset2|as_crispy_field }}
+          	   {{ form.dataset2|as_crispy_field }}
           	</div>
 
            <div class="col-xs-12 col-sm-4">
@@ -377,12 +362,8 @@ Javascript is disabled in your web browser. Please enable JavaScript to view.</d
             <b>N</b>
           </div>
         </div>
-  </div><!-- close enter-data div -->
-<p><br>
-
-
-
-
+      </div><!-- close enter-data div -->
+      <p><br>
   </div> <!-- column end -->
 
   <div class="col-md-1">
@@ -448,7 +429,7 @@ Javascript is disabled in your web browser. Please enable JavaScript to view.</d
 
             <div class="diagram-box">
               <div class="responsive">
-              <img class="responsive" src="/static/tree.svg">
+              <img class="responsive" src="{% static 'tree.svg' %}">
               <input id="prob1_re" class="prob1_re" value="0.01" size="3">
            <b><div id="prob2_ne" class="prob2_ne"></div>
               <div id="prob3_tp" class="prob3_tp"></div>
@@ -467,17 +448,17 @@ Javascript is disabled in your web browser. Please enable JavaScript to view.</d
             False Discovery Rate: <b><span id="false_rate"></span></b><br>
             Sensitivity: <b><span id="sensitivity"></span></b><br>
             Specificity: <b><span id="specificity"></span></b>
+          </div>
         </div>
-      </div>
-    </div>  <!-- end of tabbed -->
-    {% endif %}
+      </div>  <!-- end tabbed -->
+      {% endif %}
+    </div>
+  </div> <!-- end row -->
+
+
+  <div id="SmallScreen" style="height: 1200px;">  <!-- buffer space for small screens -->
   </div>
-</div>
-
-
-<div id="SmallScreen" style="height: 1200px;">  <!-- buffer space for small screens -->
-</div>
-<br><br><br>
+  <br><br><br>
 
 
   <a name="more-info"></a>
@@ -486,11 +467,11 @@ Javascript is disabled in your web browser. Please enable JavaScript to view.</d
 
     The Welch’s <i>t</i>-test, or unequal variances <i>t</i>-test, can test hypotheses such as whether the means of two independent normally-distributed populations are equal. While the commonly-used Student <i>t</i>-test requires that the two samples share equal variances and equal sample sizes, the Welch’s <i>t</i>-test does not have this requirement. Researchers argue that the Welch’s <i>t</i>-test is more versatile and should instead be used by default.<sup>1,2</sup>
     <br><br>
-    Statistical rigor can be achieved with <i>t</i>-tests, yet the level of significance is set arbitrarily. While lowering significance levels mitigates false positives (&#945;), the probability of false negatives (&#946;) increases, and tests may fail to detect existing effects.<sup>3</sup>
+    Statistical rigor can be achieved with <i>t</i>-tests, yet the significance level is set arbitrarily. While lowering significance levels mitigates false positives (&#945;), the probability of false negatives (&#946;) increases, and tests may fail to detect existing effects.<sup>3</sup>
   </div>
   <br>
 
-  <div class="grey-back">
+  <div style="padding: 10px 20px 20px 20px;" class="grey-back">
     <h4>References</h4>
 
     1. Dahiru, T. P-value, a true test of statistical significance? A cautionary note. <i>Annals of Ibadan Postgraduate Medicine.</i> 2008, <i>6</i>(1): 21–26.
@@ -959,7 +940,7 @@ $(window).resize(function(e) {
 });
 
 
-// function is shorthand for getting element id
+// function provides shorthand for getting element id
 function elem(elem_id){
   return document.getElementById(elem_id);
 }
