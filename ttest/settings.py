@@ -169,7 +169,7 @@ if os.getcwd() == '/app':
     # I added this for Heroku
     SECURE_SSL_REDIRECT = True
     PREPEND_WWW = True
-    BASE_URL = "https://welchsttest.herokuapp.com/"
+    #BASE_URL = "https://welchsttest.herokuapp.com/"
 
     # Allow only Heroku to host the project.
     ALLOWED_HOSTS = ['welchsttest.herokuapp.com']
