@@ -18,15 +18,15 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # SECURITY WARNING: keep the secret key used in production secret!
 # Read secret key from a file
-# try:
-#     with open('k.txt') as f:
-#         SECRET_KEY = f.read().strip()
-# except Exception:
-SECRET_KEY = 'secret key'
+try:
+    with open('k.txt') as f:
+        SECRET_KEY = f.read().strip()
+except Exception:
+    SECRET_KEY = 'secret key'
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['localhost']
 
@@ -174,7 +174,7 @@ if os.getcwd() == '/app':
     # BASE_URL = "https://welchsttest.herokuapp.com/"
 
     # Allow only Heroku to host the project.
-    ALLOWED_HOSTS = ['*'] # 'welchsttest.herokuapp.com'
+    ALLOWED_HOSTS = ['welchsttest.herokuapp.com']
 
     # MEDIA_URL = "ttest/static/media/"
 
