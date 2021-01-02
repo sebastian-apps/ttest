@@ -172,7 +172,7 @@ if os.getcwd() == '/app':
     BASE_URL = "https://welchsttest.herokuapp.com/"
 
     # Allow only Heroku to host the project.
-    ALLOWED_HOSTS = ['.welchsttest.herokuapp.com']
+    ALLOWED_HOSTS = ['welchsttest.herokuapp.com']
 
     MEDIA_URL = "ttest/static/media/"
 
