@@ -149,6 +149,8 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 
 
+
+
 # Heroku Settings
 if os.getcwd() == '/app':
     import dj_database_url
@@ -156,27 +158,27 @@ if os.getcwd() == '/app':
         'default': dj_database_url.config(default='postgres://localhost')
     }
 
-    # I added based on python manage.py check --deploy
-    SECURE_CONTENT_TYPE_NOSNIFF = True
-    SECURE_BROWSER_XSS_FILTER = True
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
-    X_FRAME_OPTIONS = 'DENY'
+    # # I added based on python manage.py check --deploy
+    # SECURE_CONTENT_TYPE_NOSNIFF = True
+    # SECURE_BROWSER_XSS_FILTER = True
+    # SESSION_COOKIE_SECURE = True
+    # CSRF_COOKIE_SECURE = True
+    # X_FRAME_OPTIONS = 'DENY'
 
     # Honor the 'X-Forwarded-Proto' header for request.is.secure().
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
     # I added this for Heroku
-    SECURE_SSL_REDIRECT = True
-    PREPEND_WWW = True
-    #BASE_URL = "https://welchsttest.herokuapp.com/"
+    # SECURE_SSL_REDIRECT = True
+    # PREPEND_WWW = True
+    # BASE_URL = "https://welchsttest.herokuapp.com/"
 
     # Allow only Heroku to host the project.
-    ALLOWED_HOSTS = ['welchsttest.herokuapp.com']
+    ALLOWED_HOSTS = ['*'] # 'welchsttest.herokuapp.com'
 
-    MEDIA_URL = "ttest/static/media/"
+    # MEDIA_URL = "ttest/static/media/"
 
-    DEBUG = False
+    # DEBUG = False
 
     # Static asset configuration
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))  # from Stack Overflow
