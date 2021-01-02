@@ -180,6 +180,13 @@ if os.getcwd() == '/app':
 
     # DEBUG = False
 
-    # Static asset configuration
-    BASE_DIR = os.path.dirname(os.path.abspath(__file__))  # from Stack Overflow
-    STATIC_ROOT = os.path.join(BASE_DIR, 'static')   # from Stack Overflow
+    # # Static asset configuration
+    # BASE_DIR = os.path.dirname(os.path.abspath(__file__))  # from Stack Overflow
+    # STATIC_ROOT = os.path.join(BASE_DIR, 'static')   # from Stack Overflow
+
+
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    STATIC_ROOT = 'staticfiles'
+    STATICFILES_DIRS = (
+       os.path.join(BASE_DIR, 'static'),
+    )
