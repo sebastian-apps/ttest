@@ -1,4 +1,4 @@
-function draw_alpha_curve(){
+function drawAlphaCurve(){
     // Fill the area under the curve representing alpha.
     let alpha_curve = [];
     // this datapoint connects with the critical t vertical line
@@ -13,7 +13,7 @@ function draw_alpha_curve(){
   }
   
   
-  function draw_beta_curve(){
+  function drawBetaCurve(){
     // Fill the area under the curve representing beta.
     let beta_curve = [];
     for(var i = 0; i < group2.dist.length; i++) {
@@ -44,6 +44,16 @@ function getAlpha(){
 function getBeta(){
   return computeArea(crit_t_value_beta, df);
 }
+
+
+function getFalseDiscoveryRate(FP, TP){
+  /*Calculate the False Discovery Rate (FDR)
+  FP: False Positive
+  TP: True Positive
+  */
+  return math.round(100*FP/(FP + TP),2);
+}
+
 
 
 function computeArea(x, df) {
@@ -109,35 +119,8 @@ function Betinc(X,A,B) {
 }
 
 
-    /*
-    Functions below may be used at a future date.
 
 
-    BELOW FOR NORMAL CURVE (Z-TEST)
-    function error_f(x, mean, sd){
-      return (1/(sd*math.sqrt(2*math.pi)))*math.exp((-((x-mean) ** 2))/(2*sd ** 2));
-      //return (1/(sd*math.sqrt(2*math.pi)))*math.exp((-((x-mean)^2))/(2*sd^2));
-    }
-
-    function area_under_curve(x1, x2, mean, sd){
-      return -0.5*(math.erf((mean-x2)/(math.sqrt(2)*sd)) - math.erf((mean-x1)/(math.sqrt(2)*sd)));
-    }
-
-
-    const width  = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-    if (width <= 1000){
-      lineChart.options.annotation.annotations[0].label['enabled'] = true;
-      lineChart.options.annotation.annotations[1].label['enabled'] = true;
-      lineChart.update();
-    }
-    */
-	
-	
-    /*
-    Bayes Factor = Likelihood Ratio = Sensitivity / False Positive Rate
-    */
-	
-    
 
 function getLineChart(){
   return new Chart(elem("line_chart"), {
@@ -162,13 +145,13 @@ function getLineChart(){
             borderColor: "#0000ff",
             fill: false,
           }, {
-            data: alpha_curve,
+            data: [], // Alpha Curve
             label: "\u03B1",
             borderColor: "transparent",
             backgroundColor: "#ff000055",
             fill: true
           }, {
-            data: beta_curve,
+            data: [], // Beta Curve
             label: "\u03B2",
             borderColor: "transparent",
             backgroundColor: "#0000ff55",
@@ -260,8 +243,38 @@ function getLineChart(){
             }
           }
           ],
-          drawTime: "afterDatasetsDraw" // (default)
+          drawTime: "afterDatasetsDraw" 
         }
       }
     });
 }
+
+
+
+    /*
+    Functions below may be used at a future date.
+
+
+    BELOW FOR NORMAL CURVE (Z-TEST)
+    function error_f(x, mean, sd){
+      return (1/(sd*math.sqrt(2*math.pi)))*math.exp((-((x-mean) ** 2))/(2*sd ** 2));
+      //return (1/(sd*math.sqrt(2*math.pi)))*math.exp((-((x-mean)^2))/(2*sd^2));
+    }
+
+    function area_under_curve(x1, x2, mean, sd){
+      return -0.5*(math.erf((mean-x2)/(math.sqrt(2)*sd)) - math.erf((mean-x1)/(math.sqrt(2)*sd)));
+    }
+
+
+    const width  = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+    if (width <= 1000){
+      lineChart.options.annotation.annotations[0].label['enabled'] = true;
+      lineChart.options.annotation.annotations[1].label['enabled'] = true;
+      lineChart.update();
+    }
+    */
+	
+	
+    /*
+    Bayes Factor = Likelihood Ratio = Sensitivity / False Positive Rate
+    */

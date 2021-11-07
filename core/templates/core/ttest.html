@@ -493,8 +493,6 @@ Javascript is disabled in your web browser. Please enable JavaScript to view.</d
 <script>
 
 const ROUND_DECIMALS = 4;
-var alpha_curve;
-var beta_curve;
 var shiftX;
 var alpha;
 var beta;
@@ -654,22 +652,22 @@ function moveBar(){
      shift by the non-centrality parameter. */
   crit_t_value_beta = crit_t_value - ncp;
   //elem('message').innerText = "comp area: " + computeArea(3, df);
-  elem('crit_t_value').innerText = crit_t_value;
 
-  // fill in areas under the graph, find alpha and beta
-  draw_alpha_curve();
-  draw_beta_curve();
+  // update display
+  drawAlphaCurve();
+  drawBetaCurve();
   updateConfusionMatrix();
+  showRejectOrNotReject();
+  updateProbabilityTree();
+
+  elem('crit_t_value').innerText = crit_t_value;
   elem('sig-level').innerText = round(alpha);
 
-  recommendRejectOrNotReject();
-
-  updateProbabilityTree();
 }
 
 
 
-function recommendRejectOrNotReject(){
+function showRejectOrNotReject(){
   // determine recommendation: to reject or not reject the null hypothesis
   if (crit_t_value <= t_value){
     elem('reject-or-not').innerText = "Reject the Null Hypothesis (H\u2080)";
@@ -709,8 +707,6 @@ function updateConfusionMatrix(){
 
 
 
-
-
 function updateProbabilityTree(){
 
   if ((prob1_re.value >= 0) && (prob1_re.value <= 1)) {
@@ -725,9 +721,10 @@ function updateProbabilityTree(){
     prob10_nefp.innerText = round(prob2_ne.innerText * prob6_fp.innerText);
 
     // Calculate the False Discovery Rate (FDR)
-    var fdr = math.round(parseFloat(prob10_nefp.innerText)*100/(parseFloat(prob10_nefp.innerText) + parseFloat(prob7_retp.innerText)),2);
+    // let fdr = math.round(parseFloat(prob10_nefp.innerText)*100/(parseFloat(prob10_nefp.innerText) + parseFloat(prob7_retp.innerText)),2);
+    let fdr = getFalseDiscoveryRate(parseFloat(prob10_nefp.innerText), parseFloat(prob7_retp.innerText));
     // Calculate the Positive Predictive Value (PPV)
-    var ppv = math.round(100 - fdr,2);
+    let ppv = math.round(100 - fdr,2);
 
     if (Number.isNaN(fdr)){
       fdr = " - ";
@@ -742,8 +739,6 @@ function updateProbabilityTree(){
     elem("specificity").innerText = prob5_tn.innerText;
   }
 }
-
-
 
 
 
