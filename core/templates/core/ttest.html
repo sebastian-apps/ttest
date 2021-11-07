@@ -257,16 +257,14 @@ Javascript is disabled in your web browser. Please enable JavaScript to view.</d
 <script>
 
 const ROUND_DECIMALS = 4;
-var shiftX;
 var alpha;
 var beta;
-var newLeft;
+var sliderPositionLeft;
 var df;
 var crit_t_value;
 var t_value;
 var p_value;
 var crit_t_value_beta;  // critical t with respect to the group 2 distribution, not group 1
-
 
 {% if test_results %}
   const group1 = {{ data1|safe }};
@@ -282,20 +280,20 @@ var crit_t_value_beta;  // critical t with respect to the group 2 distribution, 
 elem("ncp").innerText = round(ncp);
 elem("t_value").innerText = round(t_value);  // display t-value, even as negative
 t_value = math.abs(t_value);
-
-prob1_re = elem("prob1_re");
-prob2_ne = elem("prob2_ne");
-prob3_tp = elem("prob3_tp");
-prob4_fn = elem("prob4_fn");
-prob5_tn = elem("prob5_tn");
-prob6_fp = elem("prob6_fp");
-prob7_retp = elem("prob7_retp");
-prob8_refn = elem("prob8_refn");
-prob9_netn = elem("prob9_netn");
-prob10_nefp = elem("prob10_nefp");
-
-
 var lineChart = getLineChart();
+
+const prob1_re = elem("prob1_re");
+const prob2_ne = elem("prob2_ne");
+const prob3_tp = elem("prob3_tp");
+const prob4_fn = elem("prob4_fn");
+const prob5_tn = elem("prob5_tn");
+const prob6_fp = elem("prob6_fp");
+const prob7_retp = elem("prob7_retp");
+const prob8_refn = elem("prob8_refn");
+const prob9_netn = elem("prob9_netn");
+const prob10_nefp = elem("prob10_nefp");
+
+
 
 
 
@@ -304,22 +302,22 @@ let thumb = slider.querySelector('.thumb');
 
 thumb.onmousedown = function(event) {
   event.preventDefault(); // prevent selection start (browser action)
-  shiftX = event.clientX - thumb.getBoundingClientRect().left;
+  let shiftX = event.clientX - thumb.getBoundingClientRect().left;
   document.addEventListener('mousemove', onMouseMove);
   document.addEventListener('mouseup', onMouseUp);
 
   function onMouseMove(event) {
-    newLeft = event.clientX - shiftX - slider.getBoundingClientRect().left;
+    sliderPositionLeft = event.clientX - shiftX - slider.getBoundingClientRect().left;
     // the pointer is out of slider => lock the thumb within the boundaries
-    if (newLeft < 0) {
-      newLeft = 0;
+    if (sliderPositionLeft < 0) {
+      sliderPositionLeft = 0;
     }
     let rightEdge = slider.offsetWidth - thumb.offsetWidth;
-    if (newLeft > rightEdge) {
-      newLeft = rightEdge;
+    if (sliderPositionLeft > rightEdge) {
+      sliderPositionLeft = rightEdge;
     }
 
-    thumb.style.left = newLeft + 'px';
+    thumb.style.left = sliderPositionLeft + 'px';
     moveBar();
   }
 
@@ -335,29 +333,26 @@ thumb.ondragstart = function() {
 };
 
 
-
-
-
 // FOR MOBILE DEVICES ONLY, DRAG SLIDER
 function move_thumb_mobile(event) {
-  newLeft = event.touches[0].clientX - slider.getBoundingClientRect().left;
+  sliderPositionLeft = event.touches[0].clientX - slider.getBoundingClientRect().left;
 
   // the pointer is out of slider => lock the thumb within the boundaries
-  if (newLeft < 0) {
-    newLeft = 0;
+  if (sliderPositionLeft < 0) {
+    sliderPositionLeft = 0;
   }
   let rightEdge = slider.offsetWidth - thumb.offsetWidth;
-  if (newLeft > rightEdge) {
-    newLeft = rightEdge;
+  if (sliderPositionLeft > rightEdge) {
+    sliderPositionLeft = rightEdge;
   }
-  thumb.style.left = newLeft + 'px';
+  thumb.style.left = sliderPositionLeft + 'px';
   moveBar();
 }
 
 
 
 // Execute initially
-newLeft = initThumb(axes.x_min, axes.x_max, thumb.offsetWidth);
+sliderPositionLeft = initThumb(axes.x_min, axes.x_max, thumb.offsetWidth);
 moveBar();
 
 
@@ -378,8 +373,6 @@ function initThumb(chart_x_min, chart_x_max, thumbOffsetWidth){
   elem("thumb").style.left = new_thumb +"px";
   return new_thumb;
 }
-
-
 
 
 
@@ -407,14 +400,13 @@ function moveBar(){
   elem("slider").style.width = x2 - x1 + "px";
 
   // draw the critical t vertical line
-  crit_t_value = round(convert_screen_x_to_chart_x(newLeft, x1, x2, axes.x_min, axes.x_max, thumb.offsetWidth));
+  crit_t_value = round(convert_screen_x_to_chart_x(sliderPositionLeft, x1, x2, axes.x_min, axes.x_max, thumb.offsetWidth));
   lineChart.options.annotation.annotations[1]['value'] = crit_t_value;
   lineChart.update();
 
   /* update numeric values related to critical t.
      shift by the non-centrality parameter. */
   crit_t_value_beta = crit_t_value - ncp;
-  //elem('message').innerText = "comp area: " + computeArea(3, df);
 
   // update display
   drawAlphaCurve();
@@ -484,7 +476,6 @@ function updateProbabilityTree(){
     prob10_nefp.innerText = round(prob2_ne.innerText * prob6_fp.innerText);
 
     // Calculate the False Discovery Rate (FDR)
-    // let fdr = math.round(parseFloat(prob10_nefp.innerText)*100/(parseFloat(prob10_nefp.innerText) + parseFloat(prob7_retp.innerText)),2);
     let fdr = getFalseDiscoveryRate(parseFloat(prob10_nefp.innerText), parseFloat(prob7_retp.innerText));
     // Calculate the Positive Predictive Value (PPV)
     let ppv = math.round(100 - fdr,2);
@@ -529,7 +520,7 @@ function round(val){
 }
 
 
-// function provides shorthand for getting element id
+// provides shorthand for getting element id
 function elem(elem_id){
   return document.getElementById(elem_id);
 }
