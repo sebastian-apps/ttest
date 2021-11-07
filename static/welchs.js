@@ -1,9 +1,78 @@
+function draw_alpha_curve(){
+    // Fill the area under the curve representing alpha.
+    let alpha_curve = [];
+    // this datapoint connects with the critical t vertical line
+    alpha_curve.push({x: crit_t_value, y: t_distrib(crit_t_value, group1.df)});
+    for(var i = 0; i < group1.dist.length; i++) {
+      if (group1.dist[i]['x'] > crit_t_value){
+        alpha_curve.push({x: group1.dist[i]['x'], y: group1.dist[i]['y']});
+      }
+    }
+    lineChart.data.datasets[3]['data'] = alpha_curve;
+    lineChart.update();
+  }
+  
+  
+  function draw_beta_curve(){
+    // Fill the area under the curve representing beta.
+    let beta_curve = [];
+    for(var i = 0; i < group2.dist.length; i++) {
+      if (group2.dist[i]['x'] < crit_t_value){
+        beta_curve.push({x: group2.dist[i]['x'], y: group2.dist[i]['y']});
+      }
+    }
+    // this datapoint connects with the critical t vertical line
+    beta_curve.push({x: crit_t_value, y: t_distrib(crit_t_value-ncp, group2.df)}); // ncp acts as offset
+    lineChart.data.datasets[4]['data'] = beta_curve;
+    lineChart.update();
+  }
+  
+
+
 
 function t_distrib(t, dof){
   // For a given x, return the t distribution y value.
-  f = (math.gamma((dof+1)/2)/(math.sqrt(dof*math.pi)*math.gamma(dof/2))) * (1+((t**2)/dof))**(-(dof+1)/2);
-  return math.round(f, 6);
+  y = (math.gamma((dof+1)/2)/(math.sqrt(dof*math.pi)*math.gamma(dof/2))) * (1+((t**2)/dof))**(-(dof+1)/2);
+  return math.round(y, 6);
 }
+
+
+function getAlpha(){
+  return 1 - computeArea(crit_t_value, df);
+}
+
+function getBeta(){
+  return computeArea(crit_t_value_beta, df);
+}
+
+
+function computeArea(x, df) {
+    X=eval(x)
+    df=eval(df)
+    with (Math) {
+		if (df<=0) {
+			alert("Degrees of freedom must be positive")
+		} else {
+			A=df/2;
+			S=A+.5;
+			Z=df/(df+X*X);
+			BT=exp(LogGamma(S)-LogGamma(.5)-LogGamma(A)+A*log(Z)+.5*log(1-Z));
+			if (Z<(A+1)/(S+2)) {
+				betacdf=BT*Betinc(Z,A,.5)
+			} else {
+				betacdf=1-BT*Betinc(1-Z,.5,A)
+			}
+			if (X<0) {
+				tcdf=betacdf/2
+			} else {
+				tcdf=1-betacdf/2
+			}
+		}
+		tcdf=round(tcdf*100000)/100000;
+	}
+    return round(tcdf);
+}
+
 
 
 function LogGamma(Z) {
@@ -39,33 +108,6 @@ function Betinc(X,A,B) {
 	return A1/A
 }
 
-function compute_area(x, df) {
-    X=eval(x)
-    df=eval(df)
-    with (Math) {
-		if (df<=0) {
-			alert("Degrees of freedom must be positive")
-		} else {
-			A=df/2;
-			S=A+.5;
-			Z=df/(df+X*X);
-			BT=exp(LogGamma(S)-LogGamma(.5)-LogGamma(A)+A*log(Z)+.5*log(1-Z));
-			if (Z<(A+1)/(S+2)) {
-				betacdf=BT*Betinc(Z,A,.5)
-			} else {
-				betacdf=1-BT*Betinc(1-Z,.5,A)
-			}
-			if (X<0) {
-				tcdf=betacdf/2
-			} else {
-				tcdf=1-betacdf/2
-			}
-		}
-		tcdf=round(tcdf*100000)/100000;
-	}
-    return round(tcdf);
-}
-
 
     /*
     Functions below may be used at a future date.
@@ -95,3 +137,131 @@ function compute_area(x, df) {
     Bayes Factor = Likelihood Ratio = Sensitivity / False Positive Rate
     */
 	
+    
+
+function getLineChart(){
+  return new Chart(elem("line_chart"), {
+      type: 'scatter',
+      data: {
+        datasets: [{
+            data: [
+              {x: axes.x_min, y: 0},
+              {x: axes.x_max, y: 0},
+            ],
+            label: "refs",
+            borderColor: "transparent",
+            fill: false
+          },{
+            data: group1.dist,
+            label: "Group 1",
+            borderColor: "#ff0000",
+            fill: false
+          }, {
+            data: group2.dist,
+            label: "Group 2",
+            borderColor: "#0000ff",
+            fill: false,
+          }, {
+            data: alpha_curve,
+            label: "\u03B1",
+            borderColor: "transparent",
+            backgroundColor: "#ff000055",
+            fill: true
+          }, {
+            data: beta_curve,
+            label: "\u03B2",
+            borderColor: "transparent",
+            backgroundColor: "#0000ff55",
+            fill: true
+          }
+        ]
+      },
+      options: {
+        animation: false,
+        title: {
+          display: false,
+          text: 't-test'
+        },
+        legend:{
+          position: 'bottom',
+          labels: {
+            filter: function(item, chart) {
+                return !item.text.includes('refs'); // Remove the refs legend item
+              },
+             usePointStyle: true,
+           },
+        },
+        elements: {
+          point:{
+              radius: 0
+          }
+        },
+        scales: {
+          xAxes: [{
+              ticks : {
+              min: axes.x_min,
+              stepSize: axes.step_size,
+                  max: axes.x_max,
+              },
+            display: true,
+            gridLines: {
+              display:false,
+            },
+            scaleLabel: {
+              display: true,
+              labelString: 't'
+            }
+          }],
+          yAxes: [{
+            ticks : {
+              min: 0,
+              max: axes.y_max,
+            },
+            display: true,
+            scaleLabel: {
+              display: true,
+              labelString: 'Normalized Frequency'
+            },
+            gridLines: {
+                display:false
+            }
+          }]
+        },
+        annotation: {
+          annotations: [{
+            type: 'line',
+            mode: 'vertical',
+            scaleID: 'x-axis-1',
+            value: t_value,
+            borderColor: '#c8c8c8',
+            borderWidth: 2,
+            borderDash: [10,5],
+            label: {
+              enabled: true,
+              content: 'p = ' + p_value,
+              backgroundColor: 'transparent',
+              fontColor: '#c8c8c8',
+              position: "top",
+            }
+          },{
+            type: 'line',
+            mode: 'vertical',
+            scaleID: 'x-axis-1',
+            value: crit_t_value,
+            borderColor: '#ff7034',
+            borderWidth: 2,
+            label: {
+              enabled: true,
+              content: '\u03B1',
+              backgroundColor: 'transparent',
+              fontColor: '#4d4e4f',
+              yAdjust: 20,
+              position: "top",
+            }
+          }
+          ],
+          drawTime: "afterDatasetsDraw" // (default)
+        }
+      }
+    });
+}

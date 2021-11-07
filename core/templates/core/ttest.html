@@ -502,6 +502,7 @@ var newLeft;
 var df;
 var crit_t_value;
 var t_value;
+var p_value;
 var crit_t_value_beta;  // critical t with respect to the group 2 distribution, not group 1
 
 
@@ -509,19 +510,16 @@ var crit_t_value_beta;  // critical t with respect to the group 2 distribution, 
   const group1 = {{ data1|safe }};
   const group2 = {{ data2|safe }};
   const axes = JSON.parse('{{ axes|safe }}');
-  console.log(group1);
-  console.log(group2);
-  console.log(axes);
-
   df = {{ test_results.df }};
   ncp = {{ test_results.ncp }};
-  elem("ncp").innerText = round(ncp);
-
-  var t_value = {{ test_results.t_value }};
-  elem("t_value").innerText = round(t_value);  // display t-value, even as negative
-  t_value = math.abs(t_value);
-
+  t_value = {{ test_results.t_value }};
+  p_value = {{ test_results.p_value }};
 {% endif %}
+
+
+elem("ncp").innerText = round(ncp);
+elem("t_value").innerText = round(t_value);  // display t-value, even as negative
+t_value = math.abs(t_value);
 
 
 prob1_re = elem("prob1_re");
@@ -536,132 +534,7 @@ prob9_netn = elem("prob9_netn");
 prob10_nefp = elem("prob10_nefp");
 
 
-
-var lineChart = new Chart(elem("line_chart"), {
-  type: 'scatter',
-  data: {
-    datasets: [{
-        data: [
-          {x: axes.x_min, y: 0},
-          {x: axes.x_max, y: 0},
-        ],
-        label: "refs",
-        borderColor: "transparent",
-        fill: false
-      },{
-        data: group1.dist,
-        label: "Group 1",
-        borderColor: "#ff0000",
-        fill: false
-      }, {
-        data: group2.dist,
-        label: "Group 2",
-        borderColor: "#0000ff",
-        fill: false,
-      }, {
-        data: alpha_curve,
-        label: "\u03B1",
-        borderColor: "transparent",
-        backgroundColor: "#ff000055",
-        fill: true
-      }, {
-        data: beta_curve,
-        label: "\u03B2",
-        borderColor: "transparent",
-        backgroundColor: "#0000ff55",
-        fill: true
-      }
-    ]
-  },
-  options: {
-    animation: false,
-    title: {
-      display: false,
-      text: 't-test'
-    },
-    legend:{
-      position: 'bottom',
-      labels: {
-        filter: function(item, chart) {
-            return !item.text.includes('refs'); // Remove the refs legend item
-          },
-         usePointStyle: true,
-       },
-    },
-    elements: {
-      point:{
-          radius: 0
-      }
-    },
-    scales: {
-      xAxes: [{
-    	  ticks : {
-          min: axes.x_min,
-          stepSize: axes.step_size,
-      		max: axes.x_max,
-    	  },
-        display: true,
-        gridLines: {
-          display:false,
-        },
-        scaleLabel: {
-          display: true,
-          labelString: 't'
-        }
-      }],
-      yAxes: [{
-        ticks : {
-          min: 0,
-          max: axes.y_max,
-        },
-        display: true,
-        scaleLabel: {
-          display: true,
-          labelString: 'Normalized Frequency'
-        },
-        gridLines: {
-            display:false
-        }
-      }]
-    },
-    annotation: {
-      annotations: [{
-        type: 'line',
-        mode: 'vertical',
-        scaleID: 'x-axis-1',
-        value: t_value,
-        borderColor: '#c8c8c8',
-        borderWidth: 2,
-        borderDash: [10,5],
-        label: {
-          enabled: true,
-          content: 'p = {{ test_results.p_value }}',
-          backgroundColor: 'transparent',
-          fontColor: '#c8c8c8',
-          position: "top",
-        }
-      },{
-        type: 'line',
-        mode: 'vertical',
-        scaleID: 'x-axis-1',
-        value: crit_t_value,
-        borderColor: '#ff7034',
-        borderWidth: 2,
-        label: {
-          enabled: true,
-          content: '\u03B1',
-          backgroundColor: 'transparent',
-          fontColor: '#4d4e4f',
-          yAdjust: 20,
-          position: "top",
-        }
-      }
-      ],
-      drawTime: "afterDatasetsDraw" // (default)
-    }
-  }
-});
-
+var lineChart = getLineChart();
 
 
 
@@ -728,9 +601,6 @@ moveBar();
 
 
 
-
-
-
 function init_thumb(chart_x_min, chart_x_max, thumbOffsetWidth){
   // Initial position of the slider thumb.
   // crit_t_init is an arbitrary initial critical t value
@@ -742,8 +612,8 @@ function init_thumb(chart_x_min, chart_x_max, thumbOffsetWidth){
   var x2 = points[1]._model.x;
 
   // convert chart x value to the x screen position for the slider thumb
-  var magic_number = 3; // better implementation needed
-  var new_thumb = convert_chart_x_to_screen_x(init_x, chart_x_min, chart_x_max, x1, x2, magic_number);
+  var offset = 3;
+  var new_thumb = convert_chart_x_to_screen_x(init_x, chart_x_min, chart_x_max, x1, x2, offset);
   elem("thumb").style.left = new_thumb +"px";
   return new_thumb;
 }
@@ -752,8 +622,8 @@ function init_thumb(chart_x_min, chart_x_max, thumbOffsetWidth){
 
 
 
-function convert_chart_x_to_screen_x(x, chart_x_min, chart_x_max, x1, x2, magic_offset){
-  return math.round((((x - chart_x_min)/(chart_x_max - chart_x_min))*(x2-x1)) - magic_offset,0);
+function convert_chart_x_to_screen_x(x, chart_x_min, chart_x_max, x1, x2, offset){
+  return math.round((((x - chart_x_min)/(chart_x_max - chart_x_min))*(x2-x1)) - offset,0);
 }
 
 function convert_screen_x_to_chart_x(x, x1, x2, chart_x1, chart_x2, thumbOffsetWidth){
@@ -783,15 +653,23 @@ function moveBar(){
   /* update numeric values related to critical t.
      shift by the non-centrality parameter. */
   crit_t_value_beta = crit_t_value - ncp;
-  //elem('message').innerText = "comp area: " + compute_area(3, df);
+  //elem('message').innerText = "comp area: " + computeArea(3, df);
   elem('crit_t_value').innerText = crit_t_value;
 
   // fill in areas under the graph, find alpha and beta
   draw_alpha_curve();
   draw_beta_curve();
-  get_probabilities();
+  updateConfusionMatrix();
   elem('sig-level').innerText = round(alpha);
 
+  recommendRejectOrNotReject();
+
+  updateProbabilityTree();
+}
+
+
+
+function recommendRejectOrNotReject(){
   // determine recommendation: to reject or not reject the null hypothesis
   if (crit_t_value <= t_value){
     elem('reject-or-not').innerText = "Reject the Null Hypothesis (H\u2080)";
@@ -808,48 +686,13 @@ function moveBar(){
     elem('reject').style.backgroundColor = "#ffffff";
     elem('not-reject').style.backgroundColor = "#ffffff";
   }
-
-  updateProbabilityTree();
 }
 
 
+function updateConfusionMatrix(){
 
-
-function draw_alpha_curve(){
-  // Fill the area under the curve representing alpha.
-  alpha_curve = [];
-  // this datapoint connects with the critical t vertical line
-  alpha_curve.push({x: crit_t_value, y: t_distrib(crit_t_value, group1.df)});
-  for(var i = 0; i < group1.dist.length; i++) {
-    if (group1.dist[i]['x'] > crit_t_value){
-      alpha_curve.push({x: group1.dist[i]['x'], y: group1.dist[i]['y']});
-    }
-  }
-  lineChart.data.datasets[3]['data'] = alpha_curve;
-  lineChart.update();
-}
-
-
-function draw_beta_curve(){
-  // Fill the area under the curve representing beta.
-  beta_curve = [];
-  for(var i = 0; i < group2.dist.length; i++) {
-    if (group2.dist[i]['x'] < crit_t_value){
-      beta_curve.push({x: group2.dist[i]['x'], y: group2.dist[i]['y']});
-    }
-  }
-  // this datapoint connects with the critical t vertical line
-  beta_curve.push({x: crit_t_value, y: t_distrib(crit_t_value-ncp, group2.df)}); // ncp acts as offset
-  lineChart.data.datasets[4]['data'] = beta_curve;
-  lineChart.update();
-}
-
-
-
-function get_probabilities(){
-
-  alpha = 1 - compute_area(crit_t_value, df);
-  beta = compute_area(crit_t_value_beta, df);
+  alpha = getAlpha();
+  beta = getBeta();
 
   elem("alpha").innerText = round(alpha);
   elem("confidence").innerText = round(1-alpha);
@@ -904,10 +747,6 @@ function updateProbabilityTree(){
 
 
 
-function round(val){
-  return math.round(val, ROUND_DECIMALS).toFixed(ROUND_DECIMALS);
-}
-
 
 function clear_form() {
   elem("id_dataset1").value = '';
@@ -925,6 +764,11 @@ elem("prob1_re").onkeypress = function(event){
 $(window).resize(function(e) {
   moveBar();
 });
+
+
+function round(val){
+  return math.round(val, ROUND_DECIMALS).toFixed(ROUND_DECIMALS);
+}
 
 
 // function provides shorthand for getting element id
