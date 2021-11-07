@@ -16,254 +16,19 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prefixfree/1.0.6/prefixfree.min.js"></script>
     {% load crispy_forms_tags %}
     {% load static %}
+   
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/8.1.0/math.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prefixfree/1.0.6/prefixfree.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}" media="screen" />
+    <script src="{% static 'welchs.js' %}" type="text/javascript"></script>
 </head>
 <body>
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/8.1.0/math.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/prefixfree/1.0.6/prefixfree.min.js"></script>
 
 
 <style>
-
-.box {
-  border: 2px solid #e8e8e8;
-  padding: 10px;
-  margin: 0px;
-  border-radius: 15px;
-}
-
-.asteriskField {
-    display: none;
-}
-
-
-.responsive {
-  width: 100%;
-  height: auto;
-}
-
-.slider {
-  border-radius: 5px;
-  background: #E0E0E0;
-  background: linear-gradient(left top, #E0E0E0, #EEEEEE);
-  width: 525px;
-  height: 15px;
-  margin: 0px;
-  position: relative;
-}
-
-
-.thumb {
-  width: 15px;
-  height: 25px;
-  border-radius: 3px;
-  position: relative;
-  left: 0px;
-  top: -5px;
-  background: #ff7034;
-  cursor: pointer;
-}
-
-
-.error_box {
-  background-color: #e8e8e8;
-
-}
-
-/* Probability of Real Effect */
-.prob1_re {
-  position: absolute;
-  top: 33%;
-  left: 5%;
-  border: 1px solid #ff7034;
-}
-/* Probability of No Effect */
-.prob2_ne {
-  position: absolute;
-  top: 65%;
-  left: 5%;
-}
-/* Probability of True Positive */
-.prob3_tp {
-  position: absolute;
-  top: 20%;
-  left: 47%;
-}
-/* Probability of False Negative */
-.prob4_fn {
-  position: absolute;
-  top: 40%;
-  left: 47%;
-  color: blue;
-}
-/* Probability of True Negative  */
-.prob5_tn {
-  position: absolute;
-  top: 60%;
-  left: 47%;
-}
-/* Probability of False Positive */
-.prob6_fp {
-  position: absolute;
-  top: 80%;
-  left: 47%;
-  color: red;
-}
-/* Probability of Real Effect x True Positive */
-.prob7_retp {
-  position: absolute;
-  top: 20%;
-  left: 82%;
-}
-/* Probability of Real Effect x False Negative */
-.prob8_refn {
-  position: absolute;
-  top: 40%;
-  left: 82%;
-}
-/* Probability of No Effect x True Negative */
-.prob9_netn {
-  position: absolute;
-  top: 60%;
-  left: 82%;
-}
-/* Probability of No Effect x False Positive */
-.prob10_nefp {
-  position: absolute;
-  top: 80%;
-  left: 82%;
-}
-
-@import "compass/css3";
-
-
-* {
-  box-sizing: border-box;
-}
-
-
-::selection {
-  background-color: #4EC6DE;
-}
-
-.tabbed {
-/*  width: 700px;
-  margin: 50px auto;  */
-}
-
-.tabbed > input {
-  display: none;
-}
-
-.tabbed > label {
-  display: block;
-  float: left;
-  padding: 12px 20px;
-  margin-right: 5px;
-  margin-bottom: 0px;
-  cursor: pointer;
-  transition: background-color .3s;
-}
-
-.tabbed > label:hover,
-.tabbed > input:checked + label {
-  background: #ff7034;
-}
-
-.tabs {
-  margin: 0px;
-  padding: 0px;
-  clear: both;
-  perspective: 600px;
-}
-
-.tabs > div {
-  /* width: 700px; */
-  position: absolute;
-  border: 2px solid #ff7034;
-  padding: 10px 30px 40px;
-  line-height: 1.4em;
-  opacity: 0;
-  z-index: 0;
-}
-
-
-#tab-nav-1:checked ~ .tabs > div:nth-of-type(1),
-#tab-nav-2:checked ~ .tabs > div:nth-of-type(2){
-  opacity: 1;
-  z-index: 1;
-}
-
-.grid-container {
-  display: grid;
-  grid-template-columns: auto auto auto;
-  background-color: #ffffff;
-  padding: 0px;
-}
-.grid-item {
-  background-color: rgba(255, 255, 255, 0.8);
-  border: 1px solid #c8c8c8;  //rgba(0, 0, 0, 0.8);
-  padding: 10px;
-  text-align: center;
-}
-
-
-.diagram-box {
-  position: relative;
-  border: 1px solid #c8c8c8;
-}
-
-.enter-data{
-  border: 2px solid #c8c8c8;
-  padding: 30px;
-}
-
-/* hide for larger screens */
-#SmallScreen {
-   display: none;
-}
-
-#ContainerWindow{
-  background-color: #fff;
-  padding: 50px;
-}
-
-/* show for small screens */
-@media screen and (max-width: 1000px) {
-    #SmallScreen {
-        display: block;
-    }
-}
-
-/* remove padding on smaller screens */
-@media screen and (max-width: 500px) {
-  #ContainerWindow{
-    padding: 50px 5px 50px 5px;
-  }
-}
-
-body {
-  background-color: #ff7034;
-}
-
-.orange-back {
-  background-color: #ff7034;
-  padding: 12px;
-}
-
-.grey-back {
-  border-radius: 20px;
-  background-color: #e8e8e8;
-  padding:20px;
-}
-
-.more-info {
-  padding: 10px 20px 20px 20px;
-  border: 2px solid #ff7034;
-}
-
-
 </style>
 
 <noscript>
@@ -274,8 +39,8 @@ Javascript is disabled in your web browser. Please enable JavaScript to view.</d
 
 <div class="orange-back">
   <div class="container" style="margin-bottom:-120px">
-    <font color="white">
-  <h1>Welch's <i>t</i>-test calculator</h1></font>
+    <span style="color:white">
+  <h1>Welch's <i>t</i>-test calculator</h1></span>
   </div>
 </div>
 <br><br>
@@ -283,7 +48,7 @@ Javascript is disabled in your web browser. Please enable JavaScript to view.</d
 
 <div class="container" id="ContainerWindow">
   <div class="grey-back">
-    <div align='justify'>
+    <div style="text-align:justify">
       Is there a statistically significant difference between two datasets? Move the slider and observe the impact of the significance level on the probability of making the wrong decision. Input and explore your datasets.
       This calculator is for one-tailed Welch’s <i>t</i>-tests. The data are assumed to be normally distributed.
       <a href='#more-info'>Find more information.</a>
@@ -336,7 +101,7 @@ Javascript is disabled in your web browser. Please enable JavaScript to view.</d
               <br><br>
 
               <button name="submit" style="margin-bottom:5px" class="btn btn-primary">Analyze</button>
-              <button type="button" style="margin-bottom:5px" class="btn btn-default" onclick="clear_form()">Clear</button>
+              <button type="button" style="margin-bottom:5px" class="btn btn-default" onclick="clearForm()">Clear</button>
               <br><br>
           </div>
         </div>
@@ -394,7 +159,7 @@ Javascript is disabled in your web browser. Please enable JavaScript to view.</d
             <div class="grid-item">TRUE</div>
             <div class="grid-item" id="alpha-box">
               <b><span id="alpha"></span></b><br><br>
-              <font color="red">False Positive<br>Type I Error<br>(&#945;)</font>
+              <span style="color:red">False Positive<br>Type I Error<br>(&#945;)</span>
             </div>
             <div class="grid-item">
               <b><span id="confidence"></span></b><br><br>
@@ -407,7 +172,7 @@ Javascript is disabled in your web browser. Please enable JavaScript to view.</d
             </div>
             <div class="grid-item" id="beta-box">
               <b><span id="beta"></span></b><br><br>
-              <font color="blue">False Negative<br>Type II Error<br>(&#946;)</font>
+              <span style="color:blue">False Negative<br>Type II Error<br>(&#946;)</span>
             </div>
           </div>
         </div>
@@ -415,7 +180,7 @@ Javascript is disabled in your web browser. Please enable JavaScript to view.</d
         <div>
           <b>Positive Predictive Value (PPV)</b>
           <br><br>
-          <div align='justify'>
+          <div style="text-align:justify">
           For example, if 1% of the population is afflicted with a disease, and
           the test for the disease is 99% accurate, we may intuit that
           our diagnosis will be correct 99% of the time. However, if &#945; = 0.05 and &#946; = 0.01, we will accurately diagnose a patient with the disease only 16% of the time. The PPV in this case is 16%.<sup>4</sup>
@@ -487,7 +252,6 @@ Javascript is disabled in your web browser. Please enable JavaScript to view.</d
 
 
 
-<script src="{% static 'welchs.js' %}" type="text/javascript"></script>
 
 
 <script>
@@ -518,7 +282,6 @@ var crit_t_value_beta;  // critical t with respect to the group 2 distribution, 
 elem("ncp").innerText = round(ncp);
 elem("t_value").innerText = round(t_value);  // display t-value, even as negative
 t_value = math.abs(t_value);
-
 
 prob1_re = elem("prob1_re");
 prob2_ne = elem("prob2_ne");
@@ -594,12 +357,12 @@ function move_thumb_mobile(event) {
 
 
 // Execute initially
-newLeft = init_thumb(axes.x_min, axes.x_max, thumb.offsetWidth);
+newLeft = initThumb(axes.x_min, axes.x_max, thumb.offsetWidth);
 moveBar();
 
 
 
-function init_thumb(chart_x_min, chart_x_max, thumbOffsetWidth){
+function initThumb(chart_x_min, chart_x_max, thumbOffsetWidth){
   // Initial position of the slider thumb.
   // crit_t_init is an arbitrary initial critical t value
   var crit_t_init = {{ test_results.crit_t_init }};
@@ -743,7 +506,7 @@ function updateProbabilityTree(){
 
 
 
-function clear_form() {
+function clearForm() {
   elem("id_dataset1").value = '';
   elem("id_dataset2").value = '';
 }
