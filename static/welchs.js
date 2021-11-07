@@ -37,11 +37,11 @@ function t_distrib(t, dof){
 }
 
 
-function getAlpha(){
+function getAlpha(crit_t_value, df){
   return 1 - computeArea(crit_t_value, df);
 }
 
-function getBeta(){
+function getBeta(crit_t_value_beta, df){
   return computeArea(crit_t_value_beta, df);
 }
 

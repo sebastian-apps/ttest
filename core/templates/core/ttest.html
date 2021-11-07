@@ -412,7 +412,7 @@ function moveBar(){
   drawAlphaCurve();
   drawBetaCurve();
   updateConfusionMatrix();
-  showRejectOrNotReject();
+  showRejectOrNotReject(crit_t_value, t_value);
   updateProbabilityTree();
 
   elem('crit_t_value').innerText = crit_t_value;
@@ -422,7 +422,7 @@ function moveBar(){
 
 
 
-function showRejectOrNotReject(){
+function showRejectOrNotReject(crit_t_value, t_value){
   // determine recommendation: to reject or not reject the null hypothesis
   if (crit_t_value <= t_value){
     elem('reject-or-not').innerText = "Reject the Null Hypothesis (H\u2080)";
@@ -444,8 +444,8 @@ function showRejectOrNotReject(){
 
 function updateConfusionMatrix(){
 
-  alpha = getAlpha();
-  beta = getBeta();
+  alpha = getAlpha(crit_t_value, df);
+  beta = getBeta(crit_t_value_beta, df);
 
   elem("alpha").innerText = round(alpha);
   elem("confidence").innerText = round(1-alpha);
