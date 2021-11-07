@@ -20,13 +20,13 @@ cd ttest
 python -m venv ttest_env
 ```
 
-Activate the virtual environment <i>for OSX</i>.
+Activate the virtual environment for OSX.
 
 ```
 source ttest_env/bin/activate
 ```
 
-Activate the virtual environment <i>for Windows</i>.
+Activate the virtual environment for Windows.
 
 ```
 ttest_env\Scripts\activate
