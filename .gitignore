@@ -1,4 +1,4 @@
-tt_env/
+ttest_env/
 __pycache__/
 *.sqlite3
 k.txt
