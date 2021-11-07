@@ -2,3 +2,4 @@ ttest_env/
 __pycache__/
 *.sqlite3
 k.txt
+.DS_Store
