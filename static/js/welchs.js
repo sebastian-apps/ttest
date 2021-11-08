@@ -1,4 +1,4 @@
-function drawAlphaCurve(crit_t_value, group1){
+function drawAlphaCurve(){
     // Fill the area under the curve representing alpha.
     let alpha_curve = [];
     // this datapoint connects with the critical t vertical line
@@ -13,7 +13,7 @@ function drawAlphaCurve(crit_t_value, group1){
   }
   
   
-  function drawBetaCurve(crit_t_value, group2){
+  function drawBetaCurve(){
     // Fill the area under the curve representing beta.
     let beta_curve = [];
     for(var i = 0; i < group2.dist.length; i++) {
@@ -37,11 +37,11 @@ function t_Distrib(t, dof){
 }
 
 
-function getAlpha(crit_t_value, df){
+function getAlpha(){
   return 1 - computeArea(crit_t_value, df);
 }
 
-function getBeta(crit_t_value_beta, df){
+function getBeta(){
   return computeArea(crit_t_value_beta, df);
 }
 
