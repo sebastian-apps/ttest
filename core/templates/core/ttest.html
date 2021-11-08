@@ -62,7 +62,7 @@ Javascript is disabled in your web browser. Please enable JavaScript to view.</d
 
       {% if test_results %}
       <div id="slider" class="slider">
-        <div id="thumb" class="thumb" ontouchmove="move_thumb_mobile(event)"></div>
+        <div id="thumb" class="thumb" ontouchmove="moveThumbMobile(event)"></div>
       </div>
       <div>
         <canvas id="line_chart" width="1000" height="800"></canvas>
@@ -334,7 +334,7 @@ thumb.ondragstart = function() {
 
 
 // FOR MOBILE DEVICES ONLY, DRAG SLIDER
-function move_thumb_mobile(event) {
+function moveThumbMobile(event) {
   sliderPositionLeft = event.touches[0].clientX - slider.getBoundingClientRect().left;
 
   // the pointer is out of slider => lock the thumb within the boundaries
@@ -369,18 +369,18 @@ function initThumb(chart_x_min, chart_x_max, thumbOffsetWidth){
 
   // convert chart x value to the x screen position for the slider thumb
   var offset = 3;
-  var new_thumb = convert_chart_x_to_screen_x(init_x, chart_x_min, chart_x_max, x1, x2, offset);
+  var new_thumb = convertChartXToScreenX(init_x, chart_x_min, chart_x_max, x1, x2, offset);
   elem("thumb").style.left = new_thumb +"px";
   return new_thumb;
 }
 
 
 
-function convert_chart_x_to_screen_x(x, chart_x_min, chart_x_max, x1, x2, offset){
+function convertChartXToScreenX(x, chart_x_min, chart_x_max, x1, x2, offset){
   return math.round((((x - chart_x_min)/(chart_x_max - chart_x_min))*(x2-x1)) - offset,0);
 }
 
-function convert_screen_x_to_chart_x(x, x1, x2, chart_x1, chart_x2, thumbOffsetWidth){
+function convertScreenXToChartX(x, x1, x2, chart_x1, chart_x2, thumbOffsetWidth){
   return (x + (thumbOffsetWidth/2))/(x2 - x1)*(chart_x2-chart_x1) + chart_x1;
 }
 
@@ -400,7 +400,7 @@ function moveBar(){
   elem("slider").style.width = x2 - x1 + "px";
 
   // draw the critical t vertical line
-  crit_t_value = round(convert_screen_x_to_chart_x(sliderPositionLeft, x1, x2, axes.x_min, axes.x_max, thumb.offsetWidth));
+  crit_t_value = round(convertScreenXToChartX(sliderPositionLeft, x1, x2, axes.x_min, axes.x_max, thumb.offsetWidth));
   lineChart.options.annotation.annotations[1]['value'] = crit_t_value;
   lineChart.update();
 
