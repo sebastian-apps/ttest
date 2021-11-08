@@ -20,8 +20,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/8.1.0/math.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prefixfree/1.0.6/prefixfree.min.js"></script>
 
-    <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}" media="screen" />
-    <script src="{% static 'welchs.js' %}" type="text/javascript"></script>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}" media="screen" />
+    <script src="{% static 'js/welchs.js' %}" type="text/javascript"></script>
 </head>
 <body>
 
@@ -194,7 +194,7 @@ Javascript is disabled in your web browser. Please enable JavaScript to view.</d
 
             <div class="diagram-box">
               <div class="responsive">
-              <img class="responsive" src="{% static 'tree.svg' %}">
+              <img class="responsive" src="{% static 'images/tree.svg' %}">
               <input id="prob1_re" class="prob1_re" value="0.01" size="3">
            <b><div id="prob2_ne" class="prob2_ne"></div>
               <div id="prob3_tp" class="prob3_tp"></div>
@@ -280,7 +280,7 @@ var crit_t_value_beta;  // critical t with respect to the group 2 distribution, 
 elem("ncp").innerText = round(ncp);
 elem("t_value").innerText = round(t_value);  // display t-value, even as negative
 t_value = math.abs(t_value);
-var lineChart = getLineChart();
+var lineChart = getLineChart(axes, group1, group2, p_value, crit_t_value);
 
 const prob1_re = elem("prob1_re");
 const prob2_ne = elem("prob2_ne");
@@ -409,8 +409,11 @@ function moveBar(){
   crit_t_value_beta = crit_t_value - ncp;
 
   // update display
-  drawAlphaCurve();
-  drawBetaCurve();
+  drawAlphaCurve(crit_t_value, group1);
+  drawBetaCurve(crit_t_value, group2);
+
+
+  
   updateConfusionMatrix();
   showRejectOrNotReject(crit_t_value, t_value);
   updateProbabilityTree();

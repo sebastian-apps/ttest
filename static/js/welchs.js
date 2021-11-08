@@ -1,8 +1,8 @@
-function drawAlphaCurve(){
+function drawAlphaCurve(crit_t_value, group1){
     // Fill the area under the curve representing alpha.
     let alpha_curve = [];
     // this datapoint connects with the critical t vertical line
-    alpha_curve.push({x: crit_t_value, y: t_distrib(crit_t_value, group1.df)});
+    alpha_curve.push({x: crit_t_value, y: t_Distrib(crit_t_value, group1.df)});
     for(var i = 0; i < group1.dist.length; i++) {
       if (group1.dist[i]['x'] > crit_t_value){
         alpha_curve.push({x: group1.dist[i]['x'], y: group1.dist[i]['y']});
@@ -13,7 +13,7 @@ function drawAlphaCurve(){
   }
   
   
-  function drawBetaCurve(){
+  function drawBetaCurve(crit_t_value, group2){
     // Fill the area under the curve representing beta.
     let beta_curve = [];
     for(var i = 0; i < group2.dist.length; i++) {
@@ -22,7 +22,7 @@ function drawAlphaCurve(){
       }
     }
     // this datapoint connects with the critical t vertical line
-    beta_curve.push({x: crit_t_value, y: t_distrib(crit_t_value-ncp, group2.df)}); // ncp acts as offset
+    beta_curve.push({x: crit_t_value, y: t_Distrib(crit_t_value-ncp, group2.df)}); // ncp acts as offset
     lineChart.data.datasets[4]['data'] = beta_curve;
     lineChart.update();
   }
@@ -30,7 +30,7 @@ function drawAlphaCurve(){
 
 
 
-function t_distrib(t, dof){
+function t_Distrib(t, dof){
   // For a given x, return the t distribution y value.
   y = (math.gamma((dof+1)/2)/(math.sqrt(dof*math.pi)*math.gamma(dof/2))) * (1+((t**2)/dof))**(-(dof+1)/2);
   return math.round(y, 6);
@@ -122,7 +122,7 @@ function Betinc(X,A,B) {
 
 
 
-function getLineChart(){
+function getLineChart(axes, group1, group2, p_value, crit_t_value){
   return new Chart(elem("line_chart"), {
       type: 'scatter',
       data: {
