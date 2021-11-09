@@ -50,5 +50,5 @@ Run the server.
 python manage.py runserver
 ```
 
-View django-project at localhost:8000 
+View the project at localhost:8000
 
