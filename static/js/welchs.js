@@ -258,7 +258,6 @@ function getLineChart(axes, group1, group2, p_value, crit_t_value){
     BELOW FOR NORMAL CURVE (Z-TEST)
     function error_f(x, mean, sd){
       return (1/(sd*math.sqrt(2*math.pi)))*math.exp((-((x-mean) ** 2))/(2*sd ** 2));
-      //return (1/(sd*math.sqrt(2*math.pi)))*math.exp((-((x-mean)^2))/(2*sd^2));
     }
 
     function area_under_curve(x1, x2, mean, sd){
