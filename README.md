@@ -17,6 +17,8 @@ Create the virtual environment.
 
 ```
 cd ttest
+```
+```
 python -m venv ttest_env
 ```
 
