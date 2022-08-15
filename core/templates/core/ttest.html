@@ -37,25 +37,28 @@ Javascript is disabled in your web browser. Please enable JavaScript to view.</d
 </noscript>
 
 
-<div class="orange-back">
-  <div class="container" style="margin-bottom:-120px">
-    <span style="color:white">
-  <h1>Welch's <i>t</i>-test calculator</h1></span>
+<div id="OrangeWindow">
+  <!-- <div style="margin-bottom:-120px"> -->
+  <div id="titlename">
+    Welch's <i>t</i>-test calculator
   </div>
+  <!-- </div> -->
 </div>
-<br><br>
 
-
-<div class="container" id="ContainerWindow">
-  <div class="grey-back">
-    <div style="text-align:justify">
-      Is there a statistically significant difference between two datasets? Move the slider and observe the impact of the significance level on the probability of making the wrong decision. Input and explore your datasets.
-      This calculator is for one-tailed Welch’s <i>t</i>-tests. The data are assumed to be normally distributed.
-      <a href='#more-info'>Find more information.</a>
-    </div>
+<div id="BlackWindow">
+  <div style="text-align:justify">
+    Is there a statistically significant difference between two datasets?<p></p>
+    Move the slider and observe the impact of the significance level on the probability of making the wrong decision. Input and explore your datasets.
+    This calculator is for one-tailed Welch’s <i>t</i>-tests. The data are assumed to be normally distributed.
+    <a href='#more-info'>Find more information.</a>
   </div>
-  <p><br><br><br>
+  <p>
 
+
+</div>
+<div class="container" id="ContainerWindow">
+
+  <p><br><p><br><p></p><br><p></p>
 
   <div class="row">
     <div class="col-md-6">
@@ -226,6 +229,9 @@ Javascript is disabled in your web browser. Please enable JavaScript to view.</d
   <br><br><br>
 
 
+</div>
+<div id="BlackWindow">
+
   <a name="more-info"></a>
   <div class="more-info">
     <h4>More information</h4>
@@ -236,7 +242,10 @@ Javascript is disabled in your web browser. Please enable JavaScript to view.</d
   </div>
   <br>
 
-  <div style="padding: 10px 20px 20px 20px;" class="grey-back">
+
+</div>
+<div id="WhiteWindow">
+
     <h4>References</h4>
 
     1. Dahiru, T. P-value, a true test of statistical significance? A cautionary note. <i>Annals of Ibadan Postgraduate Medicine.</i> 2008, <i>6</i>(1): 21–26.
@@ -246,7 +255,7 @@ Javascript is disabled in your web browser. Please enable JavaScript to view.</d
     3. Benjamin, D.J.; Berger, J.O.; Johannesson, M. et al. Redefine statistical significance. <i>Nature Human Behaviour.</i> 2018, <i>2</i>, 6–10.
     <br>
     4. Colquhoun, D. An investigation of the false discovery rate and the misinterpretation of p-values. <i>Royal Society Open Science.</i> 2014, <i>1</i>(3): 140216.
-  </div>
+
 </div>  <!-- container -->
 <br>
 
@@ -426,13 +435,13 @@ function showRejectOrNotReject(){
   // determine recommendation: to reject or not reject the null hypothesis
   if (crit_t_value <= t_value){
     elem('reject-or-not').innerText = "Reject the Null Hypothesis (H\u2080)";
-    elem('reject').style.backgroundColor = "#ff7034";
+    elem('reject').style.backgroundColor = "#ff3e00";
     elem('not-reject').style.backgroundColor = "#ffffff";
 
   } else if (crit_t_value > t_value) {
     elem('reject-or-not').innerText = "Do Not Reject the Null Hypothesis (H\u2080)";
     elem('reject').style.backgroundColor = "#ffffff";
-    elem('not-reject').style.backgroundColor = "#ff7034";
+    elem('not-reject').style.backgroundColor = "#ff3e00";
 
   } else {
     elem('reject-or-not').innerText = " ";
