@@ -16,254 +16,19 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prefixfree/1.0.6/prefixfree.min.js"></script>
     {% load crispy_forms_tags %}
     {% load static %}
+   
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/8.1.0/math.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prefixfree/1.0.6/prefixfree.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}" media="screen" />
+    <script src="{% static 'js/welchs.js' %}" type="text/javascript"></script>
 </head>
 <body>
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/8.1.0/math.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/prefixfree/1.0.6/prefixfree.min.js"></script>
 
 
 <style>
-
-.box {
-  border: 2px solid #e8e8e8;
-  padding: 10px;
-  margin: 0px;
-  border-radius: 15px;
-}
-
-.asteriskField {
-    display: none;
-}
-
-
-.responsive {
-  width: 100%;
-  height: auto;
-}
-
-.slider {
-  border-radius: 5px;
-  background: #E0E0E0;
-  background: linear-gradient(left top, #E0E0E0, #EEEEEE);
-  width: 525px;
-  height: 15px;
-  margin: 0px;
-  position: relative;
-}
-
-
-.thumb {
-  width: 15px;
-  height: 25px;
-  border-radius: 3px;
-  position: relative;
-  left: 0px;
-  top: -5px;
-  background: #ff7034;
-  cursor: pointer;
-}
-
-
-.error_box {
-  background-color: #e8e8e8;
-
-}
-
-/* Probability of Real Effect */
-.prob1_re {
-  position: absolute;
-  top: 33%;
-  left: 5%;
-  border: 1px solid #ff7034;
-}
-/* Probability of No Effect */
-.prob2_ne {
-  position: absolute;
-  top: 65%;
-  left: 5%;
-}
-/* Probability of True Positive */
-.prob3_tp {
-  position: absolute;
-  top: 20%;
-  left: 47%;
-}
-/* Probability of False Negative */
-.prob4_fn {
-  position: absolute;
-  top: 40%;
-  left: 47%;
-  color: blue;
-}
-/* Probability of True Negative  */
-.prob5_tn {
-  position: absolute;
-  top: 60%;
-  left: 47%;
-}
-/* Probability of False Positive */
-.prob6_fp {
-  position: absolute;
-  top: 80%;
-  left: 47%;
-  color: red;
-}
-/* Probability of Real Effect x True Positive */
-.prob7_retp {
-  position: absolute;
-  top: 20%;
-  left: 82%;
-}
-/* Probability of Real Effect x False Negative */
-.prob8_refn {
-  position: absolute;
-  top: 40%;
-  left: 82%;
-}
-/* Probability of No Effect x True Negative */
-.prob9_netn {
-  position: absolute;
-  top: 60%;
-  left: 82%;
-}
-/* Probability of No Effect x False Positive */
-.prob10_nefp {
-  position: absolute;
-  top: 80%;
-  left: 82%;
-}
-
-@import "compass/css3";
-
-
-* {
-  box-sizing: border-box;
-}
-
-
-::selection {
-  background-color: #4EC6DE;
-}
-
-.tabbed {
-/*  width: 700px;
-  margin: 50px auto;  */
-}
-
-.tabbed > input {
-  display: none;
-}
-
-.tabbed > label {
-  display: block;
-  float: left;
-  padding: 12px 20px;
-  margin-right: 5px;
-  margin-bottom: 0px;
-  cursor: pointer;
-  transition: background-color .3s;
-}
-
-.tabbed > label:hover,
-.tabbed > input:checked + label {
-  background: #ff7034;
-}
-
-.tabs {
-  margin: 0px;
-  padding: 0px;
-  clear: both;
-  perspective: 600px;
-}
-
-.tabs > div {
-  /* width: 700px; */
-  position: absolute;
-  border: 2px solid #ff7034;
-  padding: 10px 30px 40px;
-  line-height: 1.4em;
-  opacity: 0;
-  z-index: 0;
-}
-
-
-#tab-nav-1:checked ~ .tabs > div:nth-of-type(1),
-#tab-nav-2:checked ~ .tabs > div:nth-of-type(2){
-  opacity: 1;
-  z-index: 1;
-}
-
-.grid-container {
-  display: grid;
-  grid-template-columns: auto auto auto;
-  background-color: #ffffff;
-  padding: 0px;
-}
-.grid-item {
-  background-color: rgba(255, 255, 255, 0.8);
-  border: 1px solid #c8c8c8;  //rgba(0, 0, 0, 0.8);
-  padding: 10px;
-  text-align: center;
-}
-
-
-.diagram-box {
-  position: relative;
-  border: 1px solid #c8c8c8;
-}
-
-.enter-data{
-  border: 2px solid #c8c8c8;
-  padding: 30px;
-}
-
-/* hide for larger screens */
-#SmallScreen {
-   display: none;
-}
-
-#ContainerWindow{
-  background-color: #fff;
-  padding: 50px;
-}
-
-/* show for small screens */
-@media screen and (max-width: 1000px) {
-    #SmallScreen {
-        display: block;
-    }
-}
-
-/* remove padding on smaller screens */
-@media screen and (max-width: 500px) {
-  #ContainerWindow{
-    padding: 50px 5px 50px 5px;
-  }
-}
-
-body {
-  background-color: #ff7034;
-}
-
-.orange-back {
-  background-color: #ff7034;
-  padding: 12px;
-}
-
-.grey-back {
-  border-radius: 20px;
-  background-color: #e8e8e8;
-  padding:20px;
-}
-
-.more-info {
-  padding: 10px 20px 20px 20px;
-  border: 2px solid #ff7034;
-}
-
-
 </style>
 
 <noscript>
@@ -272,32 +37,33 @@ Javascript is disabled in your web browser. Please enable JavaScript to view.</d
 </noscript>
 
 
-<div class="orange-back">
-  <div class="container" style="margin-bottom:-120px">
-    <font color="white">
-  <h1>Welch's <i>t</i>-test calculator</h1></font>
+<div class="hero-image" id="OrangeWindow">
+  <div id="titlename">
+    Welch's <i>t</i>-test calculator
   </div>
 </div>
-<br><br>
 
-
-<div class="container" id="ContainerWindow">
-  <div class="grey-back">
-    <div align='justify'>
-      Is there a statistically significant difference between two datasets? Move the slider and observe the impact of the significance level on the probability of making the wrong decision. Input and explore your datasets.
-      This calculator is for one-tailed Welch’s <i>t</i>-tests. The data are assumed to be normally distributed.
-      <a href='#more-info'>Find more information.</a>
-    </div>
+<div id="BlackWindow">
+  <div style="text-align:justify">
+    Is there a statistically significant difference between two datasets?<p></p>
+    Move the slider and observe the impact of the significance level on the probability of making the wrong decision. Input and explore your datasets.
+    This calculator is for one-tailed Welch’s <i>t</i>-tests. The data are assumed to be normally distributed.
+    <a href='#more-info'>Find more information.</a>
   </div>
-  <p><br><br><br>
+  <p>
 
+
+</div>
+<div class="container" id="ContainerWindow">
+
+  <p><br><p><br><p></p><br><p></p>
 
   <div class="row">
     <div class="col-md-6">
 
       {% if test_results %}
       <div id="slider" class="slider">
-        <div id="thumb" class="thumb" ontouchmove="move_thumb_mobile(event)"></div>
+        <div id="thumb" class="thumb" ontouchmove="moveThumbMobile(event)"></div>
       </div>
       <div>
         <canvas id="line_chart" width="1000" height="800"></canvas>
@@ -336,7 +102,7 @@ Javascript is disabled in your web browser. Please enable JavaScript to view.</d
               <br><br>
 
               <button name="submit" style="margin-bottom:5px" class="btn btn-primary">Analyze</button>
-              <button type="button" style="margin-bottom:5px" class="btn btn-default" onclick="clear_form()">Clear</button>
+              <button type="button" style="margin-bottom:5px" class="btn btn-default" onclick="clearForm()">Clear</button>
               <br><br>
           </div>
         </div>
@@ -394,7 +160,7 @@ Javascript is disabled in your web browser. Please enable JavaScript to view.</d
             <div class="grid-item">TRUE</div>
             <div class="grid-item" id="alpha-box">
               <b><span id="alpha"></span></b><br><br>
-              <font color="red">False Positive<br>Type I Error<br>(&#945;)</font>
+              <span style="color:red">False Positive<br>Type I Error<br>(&#945;)</span>
             </div>
             <div class="grid-item">
               <b><span id="confidence"></span></b><br><br>
@@ -407,7 +173,7 @@ Javascript is disabled in your web browser. Please enable JavaScript to view.</d
             </div>
             <div class="grid-item" id="beta-box">
               <b><span id="beta"></span></b><br><br>
-              <font color="blue">False Negative<br>Type II Error<br>(&#946;)</font>
+              <span style="color:blue">False Negative<br>Type II Error<br>(&#946;)</span>
             </div>
           </div>
         </div>
@@ -415,7 +181,7 @@ Javascript is disabled in your web browser. Please enable JavaScript to view.</d
         <div>
           <b>Positive Predictive Value (PPV)</b>
           <br><br>
-          <div align='justify'>
+          <div style="text-align:justify">
           For example, if 1% of the population is afflicted with a disease, and
           the test for the disease is 99% accurate, we may intuit that
           our diagnosis will be correct 99% of the time. However, if &#945; = 0.05 and &#946; = 0.01, we will accurately diagnose a patient with the disease only 16% of the time. The PPV in this case is 16%.<sup>4</sup>
@@ -429,7 +195,7 @@ Javascript is disabled in your web browser. Please enable JavaScript to view.</d
 
             <div class="diagram-box">
               <div class="responsive">
-              <img class="responsive" src="{% static 'tree.svg' %}">
+              <img class="responsive" src="{% static 'images/tree.svg' %}">
               <input id="prob1_re" class="prob1_re" value="0.01" size="3">
            <b><div id="prob2_ne" class="prob2_ne"></div>
               <div id="prob3_tp" class="prob3_tp"></div>
@@ -461,6 +227,9 @@ Javascript is disabled in your web browser. Please enable JavaScript to view.</d
   <br><br><br>
 
 
+</div>
+<div id="BlackWindow">
+
   <a name="more-info"></a>
   <div class="more-info">
     <h4>More information</h4>
@@ -471,7 +240,10 @@ Javascript is disabled in your web browser. Please enable JavaScript to view.</d
   </div>
   <br>
 
-  <div style="padding: 10px 20px 20px 20px;" class="grey-back">
+
+</div>
+<div id="WhiteWindow">
+
     <h4>References</h4>
 
     1. Dahiru, T. P-value, a true test of statistical significance? A cautionary note. <i>Annals of Ibadan Postgraduate Medicine.</i> 2008, <i>6</i>(1): 21–26.
@@ -481,17 +253,8 @@ Javascript is disabled in your web browser. Please enable JavaScript to view.</d
     3. Benjamin, D.J.; Berger, J.O.; Johannesson, M. et al. Redefine statistical significance. <i>Nature Human Behaviour.</i> 2018, <i>2</i>, 6–10.
     <br>
     4. Colquhoun, D. An investigation of the false discovery rate and the misinterpretation of p-values. <i>Royal Society Open Science.</i> 2014, <i>1</i>(3): 140216.
-  </div>
+
 </div>  <!-- container -->
-<br>
-
-
-
-
-
-
-
-
 
 
 
@@ -499,175 +262,44 @@ Javascript is disabled in your web browser. Please enable JavaScript to view.</d
 
 
 <script>
+
 const ROUND_DECIMALS = 4;
-var alpha_curve;
-var beta_curve;
-var shiftX;
 var alpha;
 var beta;
-var newLeft;
+var sliderPositionLeft;
 var df;
 var crit_t_value;
 var t_value;
+var p_value;
 var crit_t_value_beta;  // critical t with respect to the group 2 distribution, not group 1
-
 
 {% if test_results %}
   const group1 = {{ data1|safe }};
   const group2 = {{ data2|safe }};
   const axes = JSON.parse('{{ axes|safe }}');
-  console.log(group1);
-  console.log(group2);
-  console.log(axes);
-
   df = {{ test_results.df }};
   ncp = {{ test_results.ncp }};
-  elem("ncp").innerText = round(ncp);
-
-  var t_value = {{ test_results.t_value }};
-  elem("t_value").innerText = round(t_value);  // display t-value, even as negative
-  t_value = math.abs(t_value);
-
+  t_value = {{ test_results.t_value }};
+  p_value = {{ test_results.p_value }};
 {% endif %}
 
 
-prob1_re = elem("prob1_re");
-prob2_ne = elem("prob2_ne");
-prob3_tp = elem("prob3_tp");
-prob4_fn = elem("prob4_fn");
-prob5_tn = elem("prob5_tn");
-prob6_fp = elem("prob6_fp");
-prob7_retp = elem("prob7_retp");
-prob8_refn = elem("prob8_refn");
-prob9_netn = elem("prob9_netn");
-prob10_nefp = elem("prob10_nefp");
+elem("ncp").innerText = round(ncp);
+elem("t_value").innerText = round(t_value);  // display t-value, even as negative
+t_value = math.abs(t_value);
+var lineChart = getLineChart(axes, group1, group2, p_value, crit_t_value);
 
+const prob1_re = elem("prob1_re");
+const prob2_ne = elem("prob2_ne");
+const prob3_tp = elem("prob3_tp");
+const prob4_fn = elem("prob4_fn");
+const prob5_tn = elem("prob5_tn");
+const prob6_fp = elem("prob6_fp");
+const prob7_retp = elem("prob7_retp");
+const prob8_refn = elem("prob8_refn");
+const prob9_netn = elem("prob9_netn");
+const prob10_nefp = elem("prob10_nefp");
 
-
-var lineChart = new Chart(elem("line_chart"), {
-  type: 'scatter',
-  data: {
-    datasets: [{
-        data: [
-          {x: axes.x_min, y: 0},
-          {x: axes.x_max, y: 0},
-        ],
-        label: "refs",
-        borderColor: "transparent",
-        fill: false
-      },{
-        data: group1.dist,
-        label: "Group 1",
-        borderColor: "#ff0000",
-        fill: false
-      }, {
-        data: group2.dist,
-        label: "Group 2",
-        borderColor: "#0000ff",
-        fill: false,
-      }, {
-        data: alpha_curve,
-        label: "\u03B1",
-        borderColor: "transparent",
-        backgroundColor: "#ff000055",
-        fill: true
-      }, {
-        data: beta_curve,
-        label: "\u03B2",
-        borderColor: "transparent",
-        backgroundColor: "#0000ff55",
-        fill: true
-      }
-    ]
-  },
-  options: {
-    animation: false,
-    title: {
-      display: false,
-      text: 't-test'
-    },
-    legend:{
-      position: 'bottom',
-      labels: {
-        filter: function(item, chart) {
-            return !item.text.includes('refs'); // Remove the refs legend item
-          },
-         usePointStyle: true,
-       },
-    },
-    elements: {
-      point:{
-          radius: 0
-      }
-    },
-    scales: {
-      xAxes: [{
-    	  ticks : {
-          min: axes.x_min,
-          stepSize: axes.step_size,
-      		max: axes.x_max,
-    	  },
-        display: true,
-        gridLines: {
-          display:false,
-        },
-        scaleLabel: {
-          display: true,
-          labelString: 't'
-        }
-      }],
-      yAxes: [{
-        ticks : {
-          min: 0,
-          max: axes.y_max,
-        },
-        display: true,
-        scaleLabel: {
-          display: true,
-          labelString: 'Normalized Frequency'
-        },
-        gridLines: {
-            display:false
-        }
-      }]
-    },
-    annotation: {
-      annotations: [{
-        type: 'line',
-        mode: 'vertical',
-        scaleID: 'x-axis-1',
-        value: t_value,
-        borderColor: '#c8c8c8',
-        borderWidth: 2,
-        borderDash: [10,5],
-        label: {
-          enabled: true,
-          content: 'p = {{ test_results.p_value }}',
-          backgroundColor: 'transparent',
-          fontColor: '#c8c8c8',
-          position: "top",
-        }
-      },{
-        type: 'line',
-        mode: 'vertical',
-        scaleID: 'x-axis-1',
-        value: crit_t_value,
-        borderColor: '#ff7034',
-        borderWidth: 2,
-        label: {
-          enabled: true,
-          content: '\u03B1',
-          backgroundColor: 'transparent',
-          fontColor: '#4d4e4f',
-          yAdjust: 20,
-          position: "top",
-        }
-      }
-      ],
-      drawTime: "afterDatasetsDraw" // (default)
-    }
-  }
-});
 
 
 
@@ -677,22 +309,22 @@ let thumb = slider.querySelector('.thumb');
 
 thumb.onmousedown = function(event) {
   event.preventDefault(); // prevent selection start (browser action)
-  shiftX = event.clientX - thumb.getBoundingClientRect().left;
+  let shiftX = event.clientX - thumb.getBoundingClientRect().left;
   document.addEventListener('mousemove', onMouseMove);
   document.addEventListener('mouseup', onMouseUp);
 
   function onMouseMove(event) {
-    newLeft = event.clientX - shiftX - slider.getBoundingClientRect().left;
+    sliderPositionLeft = event.clientX - shiftX - slider.getBoundingClientRect().left;
     // the pointer is out of slider => lock the thumb within the boundaries
-    if (newLeft < 0) {
-      newLeft = 0;
+    if (sliderPositionLeft < 0) {
+      sliderPositionLeft = 0;
     }
     let rightEdge = slider.offsetWidth - thumb.offsetWidth;
-    if (newLeft > rightEdge) {
-      newLeft = rightEdge;
+    if (sliderPositionLeft > rightEdge) {
+      sliderPositionLeft = rightEdge;
     }
 
-    thumb.style.left = newLeft + 'px';
+    thumb.style.left = sliderPositionLeft + 'px';
     moveBar();
   }
 
@@ -708,37 +340,31 @@ thumb.ondragstart = function() {
 };
 
 
-
-
-
 // FOR MOBILE DEVICES ONLY, DRAG SLIDER
-function move_thumb_mobile(event) {
-  newLeft = event.touches[0].clientX - slider.getBoundingClientRect().left;
+function moveThumbMobile(event) {
+  sliderPositionLeft = event.touches[0].clientX - slider.getBoundingClientRect().left;
 
   // the pointer is out of slider => lock the thumb within the boundaries
-  if (newLeft < 0) {
-    newLeft = 0;
+  if (sliderPositionLeft < 0) {
+    sliderPositionLeft = 0;
   }
   let rightEdge = slider.offsetWidth - thumb.offsetWidth;
-  if (newLeft > rightEdge) {
-    newLeft = rightEdge;
+  if (sliderPositionLeft > rightEdge) {
+    sliderPositionLeft = rightEdge;
   }
-  thumb.style.left = newLeft + 'px';
+  thumb.style.left = sliderPositionLeft + 'px';
   moveBar();
 }
 
 
 
 // Execute initially
-newLeft = init_thumb(axes.x_min, axes.x_max, thumb.offsetWidth);
+sliderPositionLeft = initThumb(axes.x_min, axes.x_max, thumb.offsetWidth);
 moveBar();
 
 
 
-
-
-
-function init_thumb(chart_x_min, chart_x_max, thumbOffsetWidth){
+function initThumb(chart_x_min, chart_x_max, thumbOffsetWidth){
   // Initial position of the slider thumb.
   // crit_t_init is an arbitrary initial critical t value
   var crit_t_init = {{ test_results.crit_t_init }};
@@ -749,21 +375,19 @@ function init_thumb(chart_x_min, chart_x_max, thumbOffsetWidth){
   var x2 = points[1]._model.x;
 
   // convert chart x value to the x screen position for the slider thumb
-  var magic_number = 3; // better implementation needed
-  var new_thumb = convert_chart_x_to_screen_x(init_x, chart_x_min, chart_x_max, x1, x2, magic_number);
+  var offset = 3;
+  var new_thumb = convertChartXToScreenX(init_x, chart_x_min, chart_x_max, x1, x2, offset);
   elem("thumb").style.left = new_thumb +"px";
   return new_thumb;
 }
 
 
 
-
-
-function convert_chart_x_to_screen_x(x, chart_x_min, chart_x_max, x1, x2, magic_offset){
-  return math.round((((x - chart_x_min)/(chart_x_max - chart_x_min))*(x2-x1)) - magic_offset,0);
+function convertChartXToScreenX(x, chart_x_min, chart_x_max, x1, x2, offset){
+  return math.round((((x - chart_x_min)/(chart_x_max - chart_x_min))*(x2-x1)) - offset,0);
 }
 
-function convert_screen_x_to_chart_x(x, x1, x2, chart_x1, chart_x2, thumbOffsetWidth){
+function convertScreenXToChartX(x, x1, x2, chart_x1, chart_x2, thumbOffsetWidth){
   return (x + (thumbOffsetWidth/2))/(x2 - x1)*(chart_x2-chart_x1) + chart_x1;
 }
 
@@ -783,86 +407,52 @@ function moveBar(){
   elem("slider").style.width = x2 - x1 + "px";
 
   // draw the critical t vertical line
-  crit_t_value = round(convert_screen_x_to_chart_x(newLeft, x1, x2, axes.x_min, axes.x_max, thumb.offsetWidth));
+  crit_t_value = round(convertScreenXToChartX(sliderPositionLeft, x1, x2, axes.x_min, axes.x_max, thumb.offsetWidth));
   lineChart.options.annotation.annotations[1]['value'] = crit_t_value;
   lineChart.update();
 
   /* update numeric values related to critical t.
      shift by the non-centrality parameter. */
   crit_t_value_beta = crit_t_value - ncp;
-  //elem('message').innerText = "comp area: " + compute_area(3, df);
-  elem('crit_t_value').innerText = crit_t_value;
 
-  // fill in areas under the graph, find alpha and beta
-  draw_alpha_curve();
-  draw_beta_curve();
-  get_probabilities();
+  // update display
+  drawAlphaCurve();
+  drawBetaCurve();
+  updateConfusionMatrix();
+  showRejectOrNotReject();
+  updateProbabilityTree();
+
+  elem('crit_t_value').innerText = crit_t_value;
   elem('sig-level').innerText = round(alpha);
 
+}
+
+
+
+function showRejectOrNotReject(){
   // determine recommendation: to reject or not reject the null hypothesis
   if (crit_t_value <= t_value){
     elem('reject-or-not').innerText = "Reject the Null Hypothesis (H\u2080)";
-    elem('reject').style.backgroundColor = "#ff7034";
+    elem('reject').style.backgroundColor = "#ff3e00";
     elem('not-reject').style.backgroundColor = "#ffffff";
 
   } else if (crit_t_value > t_value) {
     elem('reject-or-not').innerText = "Do Not Reject the Null Hypothesis (H\u2080)";
     elem('reject').style.backgroundColor = "#ffffff";
-    elem('not-reject').style.backgroundColor = "#ff7034";
+    elem('not-reject').style.backgroundColor = "#ff3e00";
 
   } else {
     elem('reject-or-not').innerText = " ";
     elem('reject').style.backgroundColor = "#ffffff";
     elem('not-reject').style.backgroundColor = "#ffffff";
   }
-
-  updateProbabilityTree();
 }
 
 
+function updateConfusionMatrix(){
 
-function t_distrib(t, dof){
-  // For a given x, return the t distribution y value.
-  f = (math.gamma((dof+1)/2)/(math.sqrt(dof*math.pi)*math.gamma(dof/2))) * (1+((t**2)/dof))**(-(dof+1)/2);
-  return math.round(f, 6);
-}
-
-
-function draw_alpha_curve(){
-  // Fill the area under the curve representing alpha.
-  alpha_curve = [];
-  // this datapoint connects with the critical t vertical line
-  alpha_curve.push({x: crit_t_value, y: t_distrib(crit_t_value, group1.df)});
-  for(var i = 0; i < group1.dist.length; i++) {
-    if (group1.dist[i]['x'] > crit_t_value){
-      alpha_curve.push({x: group1.dist[i]['x'], y: group1.dist[i]['y']});
-    }
-  }
-  lineChart.data.datasets[3]['data'] = alpha_curve;
-  lineChart.update();
-}
-
-
-function draw_beta_curve(){
-  // Fill the area under the curve representing beta.
-  beta_curve = [];
-  for(var i = 0; i < group2.dist.length; i++) {
-    if (group2.dist[i]['x'] < crit_t_value){
-      beta_curve.push({x: group2.dist[i]['x'], y: group2.dist[i]['y']});
-    }
-  }
-  // this datapoint connects with the critical t vertical line
-  beta_curve.push({x: crit_t_value, y: t_distrib(crit_t_value-ncp, group2.df)}); // ncp acts as offset
-  lineChart.data.datasets[4]['data'] = beta_curve;
-  lineChart.update();
-}
-
-
-
-function get_probabilities(){
-
-  alpha = 1 - compute_area(crit_t_value, df);
-  beta = compute_area(crit_t_value_beta, df);
+  alpha = getAlpha();
+  beta = getBeta();
 
   elem("alpha").innerText = round(alpha);
   elem("confidence").innerText = round(1-alpha);
@@ -876,8 +466,6 @@ function get_probabilities(){
   //elem('alpha-box').style = "background-color: rgba(255, 0, 0, "+ (Math.round(alpha * 1000)*0.6 / (1000)).toFixed(3) +");"
   //elem('beta-box').style = "background-color: rgba(0, 0, 255, "+ (Math.round(beta * 1000)*0.6 / (1000)).toFixed(3) +");"
 }
-
-
 
 
 
@@ -895,9 +483,9 @@ function updateProbabilityTree(){
     prob10_nefp.innerText = round(prob2_ne.innerText * prob6_fp.innerText);
 
     // Calculate the False Discovery Rate (FDR)
-    var fdr = math.round(parseFloat(prob10_nefp.innerText)*100/(parseFloat(prob10_nefp.innerText) + parseFloat(prob7_retp.innerText)),2);
+    let fdr = getFalseDiscoveryRate(parseFloat(prob10_nefp.innerText), parseFloat(prob7_retp.innerText));
     // Calculate the Positive Predictive Value (PPV)
-    var ppv = math.round(100 - fdr,2);
+    let ppv = math.round(100 - fdr,2);
 
     if (Number.isNaN(fdr)){
       fdr = " - ";
@@ -916,13 +504,7 @@ function updateProbabilityTree(){
 
 
 
-
-function round(val){
-  return math.round(val, ROUND_DECIMALS).toFixed(ROUND_DECIMALS);
-}
-
-
-function clear_form() {
+function clearForm() {
   elem("id_dataset1").value = '';
   elem("id_dataset2").value = '';
 }
@@ -940,103 +522,20 @@ $(window).resize(function(e) {
 });
 
 
-// function provides shorthand for getting element id
+function round(val){
+  return math.round(val, ROUND_DECIMALS).toFixed(ROUND_DECIMALS);
+}
+
+
+// provides shorthand for getting element id
 function elem(elem_id){
   return document.getElementById(elem_id);
 }
 
 
-function LogGamma(Z) {
-	with (Math) {
-		var S=1+76.18009173/Z-86.50532033/(Z+1)+24.01409822/(Z+2)-1.231739516/(Z+3)+.00120858003/(Z+4)-.00000536382/(Z+5);
-		var LG= (Z-.5)*log(Z+4.5)-(Z+4.5)+log(S*2.50662827465);
-	}
-	return LG
-}
-
-function Betinc(X,A,B) {
-	var A0=0;
-	var B0=1;
-	var A1=1;
-	var B1=1;
-	var M9=0;
-	var A2=0;
-	var C9;
-	while (Math.abs((A1-A2)/A1)>.00001) {
-		A2=A1;
-		C9=-(A+M9)*(A+B+M9)*X/(A+2*M9)/(A+2*M9+1);
-		A0=A1+C9*A0;
-		B0=B1+C9*B0;
-		M9=M9+1;
-		C9=M9*(B-M9)*X/(A+2*M9-1)/(A+2*M9);
-		A1=A0+C9*A1;
-		B1=B0+C9*B1;
-		A0=A0/B1;
-		B0=B0/B1;
-		A1=A1/B1;
-		B1=1;
-	}
-	return A1/A
-}
-
-function compute_area(x, df) {
-    X=eval(x)
-    df=eval(df)
-    with (Math) {
-		if (df<=0) {
-			alert("Degrees of freedom must be positive")
-		} else {
-			A=df/2;
-			S=A+.5;
-			Z=df/(df+X*X);
-			BT=exp(LogGamma(S)-LogGamma(.5)-LogGamma(A)+A*log(Z)+.5*log(1-Z));
-			if (Z<(A+1)/(S+2)) {
-				betacdf=BT*Betinc(Z,A,.5)
-			} else {
-				betacdf=1-BT*Betinc(1-Z,.5,A)
-			}
-			if (X<0) {
-				tcdf=betacdf/2
-			} else {
-				tcdf=1-betacdf/2
-			}
-		}
-		tcdf=round(tcdf*100000)/100000;
-	}
-    return round(tcdf);
-}
-
-
-    /*
-    Functions below may be used at a future date.
-
-
-    BELOW FOR NORMAL CURVE (Z-TEST)
-    function error_f(x, mean, sd){
-      return (1/(sd*math.sqrt(2*math.pi)))*math.exp((-((x-mean) ** 2))/(2*sd ** 2));
-      //return (1/(sd*math.sqrt(2*math.pi)))*math.exp((-((x-mean)^2))/(2*sd^2));
-    }
-
-    function area_under_curve(x1, x2, mean, sd){
-      return -0.5*(math.erf((mean-x2)/(math.sqrt(2)*sd)) - math.erf((mean-x1)/(math.sqrt(2)*sd)));
-    }
-
-
-    const width  = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-    if (width <= 1000){
-      lineChart.options.annotation.annotations[0].label['enabled'] = true;
-      lineChart.options.annotation.annotations[1].label['enabled'] = true;
-      lineChart.update();
-    }
-    */
-	
-	
-    /*
-    Bayes Factor = Likelihood Ratio = Sensitivity / False Positive Rate
-    */
-	
-
 </script>
+
+
 
 
 </body>
