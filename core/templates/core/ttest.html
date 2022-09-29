@@ -280,7 +280,17 @@ var crit_t_value_beta;  // critical t with respect to the group 2 distribution, 
   ncp = {{ test_results.ncp }};
   t_value = {{ test_results.t_value }};
   p_value = {{ test_results.p_value }};
+  autoscroll = {{ autoscroll_down|safe }};
 {% endif %}
+
+
+
+// If user submits form, scroll down to results.
+if (autoscroll) {
+  document.querySelector('#ContainerWindow').scrollIntoView({ 
+    behavior: 'smooth' 
+  });
+}
 
 
 elem("ncp").innerText = round(ncp);
@@ -298,8 +308,6 @@ const prob7_retp = elem("prob7_retp");
 const prob8_refn = elem("prob8_refn");
 const prob9_netn = elem("prob9_netn");
 const prob10_nefp = elem("prob10_nefp");
-
-
 
 
 

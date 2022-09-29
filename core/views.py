@@ -75,6 +75,7 @@ def ttest(request):
     model_instance = None
     test_results = {}
     axes = {}
+    autoscroll_down = 0
 
     if request.method != 'POST':
         # No data submitted; create a blank form.
@@ -96,6 +97,7 @@ def ttest(request):
             dataset2 = clean_dataset(model_instance.dataset2)
             # Add here any changes before saving to database
             model_instance.save()
+            autoscroll_down = 1
 
         else: # form not valid
             context = {'form': form }
@@ -154,7 +156,7 @@ def ttest(request):
 
 
     context = { 'form': form, 'data1': data1.clean(), 'data2': data2.clean(),
-                'test_results': test_results, 'axes': json.dumps(axes),
+                'test_results': test_results, 'axes': json.dumps(axes), 'autoscroll_down': autoscroll_down
               }
     return render(request, 'core/ttest.html', context)
 
