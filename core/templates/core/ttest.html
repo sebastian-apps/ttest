@@ -30,10 +30,7 @@
 <style>
 </style>
 
-<noscript>
-<div class="disabled">
-Javascript is disabled in your web browser. Please enable JavaScript to view.</div>
-</noscript>
+<noscript><div class="disabled">Javascript is disabled in your web browser. Please enable JavaScript to view.</div></noscript>
 
 
 <div class="hero-image" id="OrangeWindow">
@@ -50,12 +47,12 @@ Javascript is disabled in your web browser. Please enable JavaScript to view.</d
     <a href='#more-info'>Find more information.</a>
   </div>
   <p>
-
-
 </div>
+
+
 <div class="container" id="ContainerWindow">
 
-  <p><br><p><br><p></p><br><p></p>
+  <p><br><p><br><p><br><p>
 
   <div class="row">
     <div class="col-md-6">
@@ -129,10 +126,10 @@ Javascript is disabled in your web browser. Please enable JavaScript to view.</d
         </div>
       </div><!-- close enter-data div -->
       <p><br>
-  </div> <!-- column end -->
+    </div> <!-- column end -->
 
-  <div class="col-md-1">
-  </div>
+    <div class="col-md-1">
+    </div>
 
   <div class="col-md-5">
 
@@ -142,6 +139,7 @@ Javascript is disabled in your web browser. Please enable JavaScript to view.</d
       <label for="tab-nav-1">Hypothesis Testing</label>
       <input type="radio" name="tabs" id="tab-nav-2">
       <label for="tab-nav-2">PPV</label>
+
       <div class="tabs">
         <div>
           <br>
@@ -175,36 +173,26 @@ Javascript is disabled in your web browser. Please enable JavaScript to view.</d
               <span style="color:blue">False Negative<br>Type II Error<br>(&#946;)</span>
             </div>
           </div>
-        </div>
+        </div> <!-- end hypothesis testing -->
 
         <div>
           <b>Positive Predictive Value (PPV)</b>
           <br><br>
-          <div style="text-align:justify">
-          For example, if 1% of the population is afflicted with a disease, and
-          the test for the disease is 99% accurate, we may intuit that
-          our diagnosis will be correct 99% of the time. However, if &#945; = 0.05 and &#946; = 0.01, we will accurately diagnose a patient with the disease only 16% of the time. The PPV in this case is 16%.<sup>4</sup>
-          <br><br>
-          The probability of the real effect (e.g., prevalence of disease) can be modified below.
-
-          </div>
-          <br><br>
 
           <b>Probability tree diagram</b>
-
             <div class="diagram-box">
               <div class="responsive">
-              <img class="responsive" src="{% static 'images/tree.svg' %}">
-              <input id="prob1_re" class="prob1_re" value="0.01" size="3">
-           <b><div id="prob2_ne" class="prob2_ne"></div>
-              <div id="prob3_tp" class="prob3_tp"></div>
-              <div id="prob4_fn" class="prob4_fn"></div>
-              <div id="prob5_tn" class="prob5_tn"></div>
-              <div id="prob6_fp" class="prob6_fp"></div>
-              <div id="prob7_retp" class="prob7_retp"></div>
-              <div id="prob8_refn" class="prob8_refn"></div>
-              <div id="prob9_netn" class="prob9_netn"></div>
-              <div id="prob10_nefp" class="prob10_nefp"></div></b>
+                <img class="responsive" src="{% static 'images/tree.svg' %}">
+                <input id="prob1_re" class="prob1_re" value="0.01" size="3">
+                <div id="prob2_ne" class="prob2_ne"></div><b>
+                <div id="prob3_tp" class="prob3_tp"></div>
+                <div id="prob4_fn" class="prob4_fn"></div>
+                <div id="prob5_tn" class="prob5_tn"></div>
+                <div id="prob6_fp" class="prob6_fp"></div>
+                <div id="prob7_retp" class="prob7_retp"></div>
+                <div id="prob8_refn" class="prob8_refn"></div>
+                <div id="prob9_netn" class="prob9_netn"></div>
+                <div id="prob10_nefp" class="prob10_nefp"></div></b>
               </div>
             </div>
             <p><br>
@@ -213,20 +201,34 @@ Javascript is disabled in your web browser. Please enable JavaScript to view.</d
             False Discovery Rate: <b><span id="false_rate"></span></b><br>
             Sensitivity: <b><span id="sensitivity"></span></b><br>
             Specificity: <b><span id="specificity"></span></b>
-          </div>
-        </div>
-      </div>  <!-- end tabbed -->
-      {% endif %}
-    </div>
-  </div> <!-- end row -->
+
+
+            <br><br><br><br><br>
+            <div style="text-align:justify">
+              For example, if 1% of the population is afflicted with a disease, and
+              the test for the disease is 99% accurate, we may intuit that
+              our diagnosis will be correct 99% of the time. However, if &#945; = 0.05 and &#946; = 0.01, we will accurately diagnose a patient with the disease only 16% of the time. The PPV in this case is 16%.<sup>4</sup>
+              <br><br>
+              The probability of the real effect (e.g., prevalence of disease) can be modified above.
+            </div>
+
+
+        </div> <!-- end PPV -->
+      </div> <!-- end tabs -->
+    </div>  <!-- end tabbed -->
+      
+    {% endif %}
+  </div> <!-- end column -->
+</div> <!-- end row -->
 
 
   <div id="SmallScreen" style="height: 1200px;">  <!-- buffer space for small screens -->
   </div>
   <br><br><br>
-
-
 </div>
+
+
+
 <div id="BlackWindow">
 
   <a name="more-info"></a>
