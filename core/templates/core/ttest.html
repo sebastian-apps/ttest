@@ -139,9 +139,13 @@
       <label for="tab-nav-1">Hypothesis Testing</label>
       <input type="radio" name="tabs" id="tab-nav-2">
       <label for="tab-nav-2">PPV</label>
+      <input type="radio" name="tabs" id="tab-nav-3">
+      <label for="tab-nav-3">ROC</label>
 
       <div class="tabs">
-        <div>
+
+
+        <div class="tab">
           <br>
           <i>H<sub>0</sub></i>: population 1 mean = population 2 mean<br>
           <i>H<sub>1</sub></i>: population 1 mean < population 2 mean<br>
@@ -175,7 +179,7 @@
           </div>
         </div> <!-- end hypothesis testing -->
 
-        <div>
+        <div class="tab">
           <b>Positive Predictive Value (PPV)</b>
           <br><br>
 
@@ -203,7 +207,7 @@
             Specificity: <b><span id="specificity"></span></b>
 
 
-            <br><br><br><br><br>
+            <br><br><br><br>
             <div style="text-align:justify">
               For example, if 1% of the population is afflicted with a disease, and
               the test for the disease is 99% accurate, we may intuit that
@@ -211,9 +215,19 @@
               <br><br>
               The probability of the real effect (e.g., prevalence of disease) can be modified above.
             </div>
-
-
         </div> <!-- end PPV -->
+
+        <div class="tab">
+          <b>Receiver Operating Characteristic (ROC)</b>
+          <br><br>
+          <div class="responsive" class="chart-container">
+            <canvas id="roc_curve" height="100%" width="100%"></canvas>
+          </div>
+
+          <br> 
+          AUC: <b><span id="auc_value"></span></b>
+        </div> <!-- end ROC -->
+
       </div> <!-- end tabs -->
     </div>  <!-- end tabbed -->
       
@@ -299,6 +313,14 @@ elem("ncp").innerText = round(ncp);
 elem("t_value").innerText = round(t_value);  // display t-value, even as negative
 t_value = math.abs(t_value);
 var lineChart = getLineChart(axes, group1, group2, p_value, crit_t_value);
+
+var roc_curve = getRocCurve(axes);
+var rocChart = getROCChart(roc_curve);
+rocChart.update();
+
+getRocCurve(axes);
+elem("auc_value").innerHTML = getAUC(axes);
+
 
 const prob1_re = elem("prob1_re");
 const prob2_ne = elem("prob2_ne");
@@ -393,7 +415,8 @@ function initThumb(chart_x_min, chart_x_max, thumbOffsetWidth){
 
 
 function convertChartXToScreenX(x, chart_x_min, chart_x_max, x1, x2, offset){
-  return math.round((((x - chart_x_min)/(chart_x_max - chart_x_min))*(x2-x1)) - offset,0);
+  //return math.round((((x - chart_x_min)/(chart_x_max - chart_x_min))*(x2-x1)) - offset,0);
+  return (((x - chart_x_min)/(chart_x_max - chart_x_min))*(x2-x1)) - offset;
 }
 
 function convertScreenXToChartX(x, x1, x2, chart_x1, chart_x2, thumbOffsetWidth){
@@ -431,6 +454,7 @@ function moveBar(){
   showRejectOrNotReject();
   updateProbabilityTree();
 
+
   elem('crit_t_value').innerText = crit_t_value;
   elem('sig-level').innerText = round(alpha);
 
@@ -460,8 +484,8 @@ function showRejectOrNotReject(){
 
 function updateConfusionMatrix(){
 
-  alpha = getAlpha();
-  beta = getBeta();
+  alpha = getAlpha(crit_t_value, df);
+  beta = getBeta(crit_t_value_beta, df);
 
   elem("alpha").innerText = round(alpha);
   elem("confidence").innerText = round(1-alpha);
@@ -470,6 +494,9 @@ function updateConfusionMatrix(){
 
   lineChart.options.annotation.annotations[1].label['content'] = '\u03B1 = ' + round(alpha);
   lineChart.update();
+
+  rocChart.data.datasets[1]['data'] = [{x: alpha, y: 1-beta}];
+  rocChart.update();
 
   // Option to have Hypothesis Testing boxes change color intensity according to magnitude of alpha and beta probability
   //elem('alpha-box').style = "background-color: rgba(255, 0, 0, "+ (Math.round(alpha * 1000)*0.6 / (1000)).toFixed(3) +");"

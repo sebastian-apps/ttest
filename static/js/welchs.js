@@ -37,12 +37,53 @@ function t_Distrib(t, dof){
 }
 
 
-function getAlpha(){
+function getAlpha(crit_t_value, df){
   return 1 - computeArea(crit_t_value, df);
 }
 
-function getBeta(){
+function getBeta(crit_t_value_beta, df){
   return computeArea(crit_t_value_beta, df);
+}
+
+
+function getRocCurve(axes){
+  console.log("axes.x_max", axes.x_max);
+  console.log("axes.x_min:", axes.x_min);
+  let partitions = 25;
+  step_size = (axes.x_max - axes.x_min)/partitions;
+  console.log("step_size:", step_size);
+  console.log();
+  roc_curve=[];
+  // crit_t_value_beta = crit_t_value - ncp;
+  for(var i = 0; i <= partitions; i++) {
+    roc_curve.push({x: getAlpha((axes.x_min+(i*step_size)), df), y: 1-getBeta(((axes.x_min+(i*step_size)))-ncp, df)});    
+  }
+  console.log("roc_curve:", roc_curve);
+  return roc_curve;
+}
+
+
+function getAUC(axes){
+  // calculate AUC using the left Riemann Sum
+  console.log("axes.x_max", axes.x_max);
+  console.log("axes.x_min:", axes.x_min);
+  let partitions = 500;
+  let step_size = (axes.x_max - axes.x_min)/partitions;
+  console.log("step_size:", step_size);
+  console.log();
+  let roc_curve=[];
+  // crit_t_value_beta = crit_t_value - ncp;
+  let auc = 0;
+  for (var i = 0; i <= partitions; i++) {
+    roc_curve.push({x: getAlpha((axes.x_min+(i*step_size)), df), y: 1-getBeta(((axes.x_min+(i*step_size)))-ncp, df)});    
+  }
+  for (var i = 0; i < roc_curve.length-1; i++) {
+    console.log("roc:", roc_curve[i].x)
+    auc = auc + (roc_curve[i].x-roc_curve[i+1].x)*roc_curve[i].y;
+  }
+
+  console.log("auc:", auc);
+  return math.round(auc, 2);
 }
 
 
@@ -249,6 +290,137 @@ function getLineChart(axes, group1, group2, p_value, crit_t_value){
     });
 }
 
+
+
+
+
+
+function getROCChart(roc_curve){
+  return new Chart(elem("roc_curve"), {
+      type: 'scatter',
+      data: {
+        datasets: [{
+            data: [
+              {x: 0, y: 0},
+              {x: 1, y: 1},
+            ],
+            label: "refs",
+            borderColor: "transparent",
+            fill: false
+          },{
+            data: [], 
+            label: "TPR",
+            borderColor: "#000000",
+            backgroundColor: "#000000",
+            fill: true,
+            pointRadius: 4
+          }, {
+            data: [{x:0,y:0}, {x:1,y:1}], // random curve for reference
+            label: "Random",
+            borderColor: "#dedede",
+            fill: false
+          },{
+            data: roc_curve,
+            label: "ROC curve",
+            borderColor: "#7600bc",
+            backgroundColor: "#ca5cdd",
+            fill: true
+            // ,pointRadius: 4
+          }
+        ]
+      },
+      options: {
+        animation: false,
+        title: {
+          display: false,
+          text: 't-test'
+        },
+        legend:{
+          position: 'bottom',
+          labels: {
+            filter: function(item, chart) {
+                return !item.text.includes('refs'); // Remove the refs legend item
+              },
+             usePointStyle: true,
+           },
+        },
+        elements: {
+          point:{
+              radius: 0
+          }
+        },
+        scales: {
+          xAxes: [{
+              ticks : {
+                min: 0,
+                stepSize: 0.2,
+                // stepValue: 0.2,
+                steps: 10,
+                max: 1,
+              },
+            display: true,
+            gridLines: {
+              display:false,
+            },
+            scaleLabel: {
+              display: true,
+              labelString: 'False positive rate (\u03B1)'
+            }
+          }],
+          yAxes: [{
+            ticks : {
+              min: 0,
+              stepSize: 0.2,
+              max: 1,
+            },
+            display: true,
+            scaleLabel: {
+              display: true,
+              labelString: 'True positive rate (1 - \u03B2)'
+            },
+            gridLines: {
+                display:false
+            }
+          }]
+        },
+        annotation: {
+          annotations: [{
+            type: 'line',
+            mode: 'vertical',
+            scaleID: 'x-axis-1',
+            value: t_value,
+            borderColor: '#c8c8c8',
+            borderWidth: 2,
+            borderDash: [10,5],
+            label: {
+              enabled: true,
+              content: 'p = ',
+              backgroundColor: 'transparent',
+              fontColor: '#c8c8c8',
+              position: "top",
+            }
+          },{
+            type: 'line',
+            mode: 'vertical',
+            scaleID: 'x-axis-1',
+            value: p_value,
+            borderColor: '#ff7034',
+            borderWidth: 2,
+            label: {
+              enabled: true,
+              content: '',
+              backgroundColor: 'transparent',
+              fontColor: '#4d4e4f',
+              yAdjust: 20,
+              position: "top",
+            }
+          }
+          ],
+          drawTime: "afterDatasetsDraw" 
+        }
+      }
+    });
+}
 
 
     /*

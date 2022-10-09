@@ -8,7 +8,7 @@ import json
 import numpy as np
 import math
 import statistics
-from statsmodels.stats.power import  tt_ind_solve_power
+from statsmodels.stats.power import tt_ind_solve_power
 
 DEC = 4  # Round values to a constant number of decimal places.
 
@@ -29,7 +29,7 @@ class Data:
         self.n = len(self.dataset)
         self.df = self.n - 1  # degrees of freedom
         self.dist = [] # distribution
-        self.step_size = 0;
+        self.step_size = 0
 
 
     def create_t_dist(self, min, max, ncp):
@@ -81,8 +81,11 @@ def ttest(request):
         # No data submitted; create a blank form.
         form = DatasetsForm()
         # Default datasets
-        dataset1 = [87, 101, 64, 86, 87, 82, 70]
-        dataset2 = [100, 124, 93, 114, 123, 130, 136]
+        # dataset1 = [87, 101, 64, 86, 87, 82, 70]
+        # dataset2 = [100, 124, 93, 114, 123, 130, 136]
+        dataset1 = [87, 101, 64, 86, 87, 82, 70, 85, 78, 92, 84, 88]
+        dataset2 = [83, 124, 86, 98, 96, 103, 89]
+
         form.fields['dataset1'].initial = prep_for_form(dataset1)
         form.fields['dataset2'].initial = prep_for_form(dataset2)
 
@@ -115,10 +118,11 @@ def ttest(request):
             form.data['dataset2'] = prep_for_form(data2.dataset)
 
         # Get inferential statistics
-        df = get_pooled_df(data1, data2) # degrees of freedom
+        df = get_df(data1, data2) # degrees of freedom
 
         t_value, p_value = get_t_and_p_value(data1, data2, df)
         effect_size, ncp = get_effect_size_ncp(data1, data2)
+        # roc_curve = get_roc_curve(data1, data2, effect_size)
 
         # Define chart's x-axis range.
         x_min, x_max = get_x_axis_min_max(data1, data2, ncp)
@@ -168,11 +172,11 @@ def get_x_axis_min_max(data1, data2, ncp):
 
 
 
-def get_pooled_df(data1, data2):
-    # Get pooled degrees of freedom
+def get_df(data1, data2):
+    # Get degrees of freedom
     v1 = data1.df
     v2 = data2.df
-    df = (((data1.sd**(2)/data1.sd)+(data2.sd**(2)/data2.sd))**(2))/(((data1.sd**(4)/(v1*data1.sd**(2))))+((data2.sd**(4)/(v2*data2.sd**(2)))))
+    df = (((data1.sd**(2)/data1.n)+(data2.sd**(2)/data2.n))**(2)) / (((data1.sd**(4)/(v1*data1.n**(2))))+((data2.sd**(4)/(v2*data2.n**(2)))))
     return math.trunc(round(df,0))
 
 
@@ -198,6 +202,18 @@ def get_effect_size_ncp(data1, data2):
     ncp = es*math.sqrt(p)
     return round(es, DEC), ncp
 
+
+
+# def get_roc_curve(data1, data2, effect_size):
+#     nobs_ratio = data1.n / data2.n
+
+#     fp_rates = [0, 0.001, 0.005, 0.01, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95, 1.0]
+#     roc_curve = []
+#     for alpha in fp_rates:
+#         power_val = tt_ind_solve_power(effect_size=effect_size, nobs1=data1.n, alpha=alpha, ratio=nobs_ratio, alternative='larger')
+#         roc_curve.append({'x': alpha, 'y': power_val})
+#     print(roc_curve)
+#     return roc_curve
 
 
 
