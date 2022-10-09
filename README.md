@@ -1,6 +1,6 @@
 # Welch's *t*-test calculator
 
-Is there a statistically significant difference between two datasets? Move the slider and observe the impact of the significance level on the probability of making the wrong decision. Input and explore your datasets. [Check it out here!](http://welchsttest.herokuapp.com)
+Is there a statistically significant difference between two datasets? Move the slider and observe the impact of the significance level on the probability of making the wrong decision. Input and explore your datasets.
 
 
 <br />
