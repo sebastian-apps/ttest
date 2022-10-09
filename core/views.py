@@ -81,8 +81,6 @@ def ttest(request):
         # No data submitted; create a blank form.
         form = DatasetsForm()
         # Default datasets
-        # dataset1 = [87, 101, 64, 86, 87, 82, 70]
-        # dataset2 = [100, 124, 93, 114, 123, 130, 136]
         dataset1 = [87, 101, 64, 86, 87, 82, 70, 85, 78, 92, 84, 88]
         dataset2 = [83, 124, 86, 98, 96, 103, 89]
 
