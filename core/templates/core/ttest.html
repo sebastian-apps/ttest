@@ -284,6 +284,7 @@ var beta;
 var sliderPositionLeft;
 var df;
 var crit_t_value;
+
 var t_value;
 var p_value;
 var crit_t_value_beta;  // critical t with respect to the group 2 distribution, not group 1
@@ -292,34 +293,25 @@ var crit_t_value_beta;  // critical t with respect to the group 2 distribution, 
   const group1 = {{ data1|safe }};
   const group2 = {{ data2|safe }};
   const axes = JSON.parse('{{ axes|safe }}');
-  df = {{ test_results.df }};
-  ncp = {{ test_results.ncp }};
-  t_value = {{ test_results.t_value }};
-  p_value = {{ test_results.p_value }};
-  autoscroll = {{ autoscroll_down|safe }};
+  var df = {{ test_results.df }};
+  var ncp = {{ test_results.ncp }};
+  var t_value = {{ test_results.t_value }};
+  var p_value = {{ test_results.p_value }};
+  var autoscroll = {{ autoscroll_down|safe }};
+  var crit_t_init = {{ test_results.crit_t_init }}; // crit_t_init is an arbitrary initial critical t value
+
+  elem("ncp").innerText = round(ncp);
+  elem("t_value").innerText = round(t_value);  // display t-value, even as negative
+  t_value = math.abs(t_value);
+
 {% endif %}
 
 
-
-// If user submits form, scroll down to results.
-if (autoscroll) {
-  document.querySelector('#ContainerWindow').scrollIntoView({ 
-    behavior: 'smooth' 
-  });
-}
-
-
-elem("ncp").innerText = round(ncp);
-elem("t_value").innerText = round(t_value);  // display t-value, even as negative
-t_value = math.abs(t_value);
-var lineChart = getLineChart(axes, group1, group2, p_value, crit_t_value);
-
+var lineChart = getLineChart(axes, group1, group2, p_value, crit_t_init);  // previously: crit_t_value
 var roc_curve = getRocCurve(axes);
 var rocChart = getROCChart(roc_curve);
 rocChart.update();
-
-getRocCurve(axes);
-elem("auc_value").innerHTML = getAUC(axes);
+elem("auc_value").innerText = getAUC(axes);
 
 
 const prob1_re = elem("prob1_re");
@@ -334,10 +326,26 @@ const prob9_netn = elem("prob9_netn");
 const prob10_nefp = elem("prob10_nefp");
 
 
-
-// OBTAIN MOUSE EVENT, DRAG SLIDER
 let thumb = slider.querySelector('.thumb');
 
+// Initialize
+sliderPositionLeft = initThumb(axes.x_min, axes.x_max, thumb.offsetWidth, crit_t_init);
+moveBar();
+
+
+
+
+
+
+// If user submits form, scroll down to results.
+if (autoscroll) {
+  document.querySelector('#ContainerWindow').scrollIntoView({ 
+    behavior: 'smooth' 
+  });
+}
+
+
+// OBTAIN MOUSE EVENT, DRAG SLIDER
 thumb.onmousedown = function(event) {
   event.preventDefault(); // prevent selection start (browser action)
   let shiftX = event.clientX - thumb.getBoundingClientRect().left;
@@ -389,24 +397,15 @@ function moveThumbMobile(event) {
 
 
 
-// Execute initially
-sliderPositionLeft = initThumb(axes.x_min, axes.x_max, thumb.offsetWidth);
-moveBar();
-
-
-
-function initThumb(chart_x_min, chart_x_max, thumbOffsetWidth){
+function initThumb(chart_x_min, chart_x_max, thumbOffsetWidth, init_x){
   // Initial position of the slider thumb.
-  // crit_t_init is an arbitrary initial critical t value
-  var crit_t_init = {{ test_results.crit_t_init }};
-  var init_x = crit_t_init;
-
+  console.log("init_x:", init_x);
   var points = lineChart.chart.getDatasetMeta(0).data;
   var x1 = points[0]._model.x;
   var x2 = points[1]._model.x;
 
   // convert chart x value to the x screen position for the slider thumb
-  var offset = 3;
+  var offset = 0; //.59;  // previously: offset=3
   var new_thumb = convertChartXToScreenX(init_x, chart_x_min, chart_x_max, x1, x2, offset);
   elem("thumb").style.left = new_thumb +"px";
   return new_thumb;
@@ -428,11 +427,11 @@ function convertScreenXToChartX(x, x1, x2, chart_x1, chart_x2, thumbOffsetWidth)
 function moveBar(){
 
   // get absolute x,y coordinates of the chart on the screen
-  var points = lineChart.chart.getDatasetMeta(0).data;
-  var x1 = points[0]._model.x;
-  var y1 = points[0]._model.y;
-  var x2 = points[1]._model.x;
-  var y2 = points[1]._model.y;
+  let points = lineChart.chart.getDatasetMeta(0).data;
+  let x1 = points[0]._model.x;
+  let y1 = points[0]._model.y;
+  let x2 = points[1]._model.x;
+  let y2 = points[1]._model.y;
 
   // adjust the slider
   elem("slider").style.left = x1 + "px";
@@ -492,9 +491,11 @@ function updateConfusionMatrix(){
   elem("beta").innerText = round(beta);
   elem("power").innerText = round(1-beta);
 
+  // update line chart
   lineChart.options.annotation.annotations[1].label['content'] = '\u03B1 = ' + round(alpha);
   lineChart.update();
 
+  // update ROC curve
   rocChart.data.datasets[1]['data'] = [{x: alpha, y: 1-beta}];
   rocChart.update();
 
@@ -554,7 +555,7 @@ elem("prob1_re").onkeypress = function(event){
 
 
 $(window).resize(function(e) {
-  moveBar();
+  // moveBar();
 });
 
 

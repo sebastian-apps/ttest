@@ -112,7 +112,7 @@ h4 {
   border-radius: 5px;
   background: #E0E0E0;
   background: linear-gradient(left top, #E0E0E0, #EEEEEE);
-  width: 525px;
+  /* width: 525px; */
   height: 15px;
   margin: 0px;
   position: relative;

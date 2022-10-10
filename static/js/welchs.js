@@ -72,13 +72,12 @@ function getAUC(axes){
   console.log("step_size:", step_size);
   console.log();
   let roc_curve=[];
-  // crit_t_value_beta = crit_t_value - ncp;
   let auc = 0;
   for (var i = 0; i <= partitions; i++) {
     roc_curve.push({x: getAlpha((axes.x_min+(i*step_size)), df), y: 1-getBeta(((axes.x_min+(i*step_size)))-ncp, df)});    
   }
+  // calculate left Riemann Sum
   for (var i = 0; i < roc_curve.length-1; i++) {
-    console.log("roc:", roc_curve[i].x)
     auc = auc + (roc_curve[i].x-roc_curve[i+1].x)*roc_curve[i].y;
   }
 
@@ -119,7 +118,8 @@ function computeArea(x, df) {
 				tcdf=1-betacdf/2
 			}
 		}
-		tcdf=round(tcdf*100000)/100000;
+		// tcdf=round(tcdf*100000)/100000;
+		// tcdf=tcdf*100000/100000;
 	}
     return round(tcdf);
 }
