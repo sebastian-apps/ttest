@@ -278,6 +278,17 @@
 
 <script>
 
+const prob1_re = elem("prob1_re");
+const prob2_ne = elem("prob2_ne");
+const prob3_tp = elem("prob3_tp");
+const prob4_fn = elem("prob4_fn");
+const prob5_tn = elem("prob5_tn");
+const prob6_fp = elem("prob6_fp");
+const prob7_retp = elem("prob7_retp");
+const prob8_refn = elem("prob8_refn");
+const prob9_netn = elem("prob9_netn");
+const prob10_nefp = elem("prob10_nefp");
+
 const ROUND_DECIMALS = 4;
 var alpha;
 var beta;
@@ -307,32 +318,16 @@ var crit_t_value_beta;  // critical t with respect to the group 2 distribution, 
 {% endif %}
 
 
+// Initialize
 var lineChart = getLineChart(axes, group1, group2, p_value, crit_t_init);  // previously: crit_t_value
 var roc_curve = getRocCurve(axes);
 var rocChart = getROCChart(roc_curve);
 rocChart.update();
 elem("auc_value").innerText = getAUC(axes);
 
-
-const prob1_re = elem("prob1_re");
-const prob2_ne = elem("prob2_ne");
-const prob3_tp = elem("prob3_tp");
-const prob4_fn = elem("prob4_fn");
-const prob5_tn = elem("prob5_tn");
-const prob6_fp = elem("prob6_fp");
-const prob7_retp = elem("prob7_retp");
-const prob8_refn = elem("prob8_refn");
-const prob9_netn = elem("prob9_netn");
-const prob10_nefp = elem("prob10_nefp");
-
-
 let thumb = slider.querySelector('.thumb');
-
-// Initialize
 sliderPositionLeft = initThumb(axes.x_min, axes.x_max, thumb.offsetWidth, crit_t_init);
-moveBar();
-
-
+// moveBar();
 
 
 
@@ -343,6 +338,84 @@ if (autoscroll) {
     behavior: 'smooth' 
   });
 }
+
+
+
+function initThumb(chart_x_min, chart_x_max, thumbOffsetWidth, crit_t_init){
+  // Initial position of the slider thumb.
+  console.log("crit_t_init:", crit_t_init);
+  var points = lineChart.chart.getDatasetMeta(0).data;
+  var x1 = points[0]._model.x;
+  var x2 = points[1]._model.x;
+
+  // convert chart x value to the x screen position for the slider thumb
+  var offset = thumb.offsetWidth/2; //.59;  // previously: offset=3
+  var new_thumb = convertChartXToScreenX(crit_t_init, chart_x_min, chart_x_max, x1, x2, offset);
+  elem("thumb").style.left = new_thumb + "px";
+
+  // BELOW IS NEW
+  // adjust the slider
+  elem("slider").style.left = x1 + "px";
+  elem("slider").style.width = x2 - x1 + "px";
+  
+  updateState(crit_t_init, df);
+
+  return new_thumb;
+}
+
+
+
+function moveBar(){
+
+  // get absolute x,y coordinates of the chart on the screen
+  let points = lineChart.chart.getDatasetMeta(0).data;
+  let x1 = points[0]._model.x;
+  let y1 = points[0]._model.y;
+  let x2 = points[1]._model.x;
+  let y2 = points[1]._model.y;
+
+  // adjust the slider
+  elem("slider").style.left = x1 + "px";
+  elem("slider").style.width = x2 - x1 + "px";
+
+  // draw the critical t vertical line
+  crit_t_value = round(convertScreenXToChartX(sliderPositionLeft, x1, x2, axes.x_min, axes.x_max, thumb.offsetWidth));
+  updateState(crit_t_value, df);
+
+}
+
+function updateState(crit_t_value, df){
+  // calculations
+  /* update numeric values related to critical t.
+     shift by the non-centrality parameter. */
+  crit_t_value_beta = crit_t_value - ncp;
+  alpha = getAlpha(crit_t_value, df);
+  beta = getBeta(crit_t_value_beta, df);
+
+  // update display
+  elem('crit_t_value').innerText = crit_t_value;
+  elem('sig-level').innerText = round(alpha);
+
+  lineChart.options.annotation.annotations[1]['value'] = crit_t_value;
+  lineChart.update();
+
+  drawAlphaCurve(group1, crit_t_value);
+  drawBetaCurve(group2, crit_t_value);
+  updateConfusionMatrix(alpha, beta);
+  showRejectOrNotReject(crit_t_value, t_value);
+  updateProbabilityTree();
+}
+
+
+function convertChartXToScreenX(x, chart_x_min, chart_x_max, x1, x2, offset){
+  //return math.round((((x - chart_x_min)/(chart_x_max - chart_x_min))*(x2-x1)) - offset,0);
+  return (((x - chart_x_min)/(chart_x_max - chart_x_min))*(x2-x1)) - offset;
+}
+
+function convertScreenXToChartX(x, x1, x2, chart_x1, chart_x2, thumbOffsetWidth){
+  return (x + (thumbOffsetWidth/2))/(x2 - x1)*(chart_x2-chart_x1) + chart_x1;
+}
+
 
 
 // OBTAIN MOUSE EVENT, DRAG SLIDER
@@ -396,95 +469,7 @@ function moveThumbMobile(event) {
 }
 
 
-
-function initThumb(chart_x_min, chart_x_max, thumbOffsetWidth, init_x){
-  // Initial position of the slider thumb.
-  console.log("init_x:", init_x);
-  var points = lineChart.chart.getDatasetMeta(0).data;
-  var x1 = points[0]._model.x;
-  var x2 = points[1]._model.x;
-
-  // convert chart x value to the x screen position for the slider thumb
-  var offset = 0; //.59;  // previously: offset=3
-  var new_thumb = convertChartXToScreenX(init_x, chart_x_min, chart_x_max, x1, x2, offset);
-  elem("thumb").style.left = new_thumb +"px";
-  return new_thumb;
-}
-
-
-
-function convertChartXToScreenX(x, chart_x_min, chart_x_max, x1, x2, offset){
-  //return math.round((((x - chart_x_min)/(chart_x_max - chart_x_min))*(x2-x1)) - offset,0);
-  return (((x - chart_x_min)/(chart_x_max - chart_x_min))*(x2-x1)) - offset;
-}
-
-function convertScreenXToChartX(x, x1, x2, chart_x1, chart_x2, thumbOffsetWidth){
-  return (x + (thumbOffsetWidth/2))/(x2 - x1)*(chart_x2-chart_x1) + chart_x1;
-}
-
-
-
-function moveBar(){
-
-  // get absolute x,y coordinates of the chart on the screen
-  let points = lineChart.chart.getDatasetMeta(0).data;
-  let x1 = points[0]._model.x;
-  let y1 = points[0]._model.y;
-  let x2 = points[1]._model.x;
-  let y2 = points[1]._model.y;
-
-  // adjust the slider
-  elem("slider").style.left = x1 + "px";
-  elem("slider").style.width = x2 - x1 + "px";
-
-  // draw the critical t vertical line
-  crit_t_value = round(convertScreenXToChartX(sliderPositionLeft, x1, x2, axes.x_min, axes.x_max, thumb.offsetWidth));
-  lineChart.options.annotation.annotations[1]['value'] = crit_t_value;
-  lineChart.update();
-
-  /* update numeric values related to critical t.
-     shift by the non-centrality parameter. */
-  crit_t_value_beta = crit_t_value - ncp;
-
-  // update display
-  drawAlphaCurve();
-  drawBetaCurve();
-  updateConfusionMatrix();
-  showRejectOrNotReject();
-  updateProbabilityTree();
-
-
-  elem('crit_t_value').innerText = crit_t_value;
-  elem('sig-level').innerText = round(alpha);
-
-}
-
-
-
-function showRejectOrNotReject(){
-  // determine recommendation: to reject or not reject the null hypothesis
-  if (crit_t_value <= t_value){
-    elem('reject-or-not').innerText = "Reject the Null Hypothesis (H\u2080)";
-    elem('reject').style.backgroundColor = "#ff3e00";
-    elem('not-reject').style.backgroundColor = "#ffffff";
-
-  } else if (crit_t_value > t_value) {
-    elem('reject-or-not').innerText = "Do Not Reject the Null Hypothesis (H\u2080)";
-    elem('reject').style.backgroundColor = "#ffffff";
-    elem('not-reject').style.backgroundColor = "#ff3e00";
-
-  } else {
-    elem('reject-or-not').innerText = " ";
-    elem('reject').style.backgroundColor = "#ffffff";
-    elem('not-reject').style.backgroundColor = "#ffffff";
-  }
-}
-
-
-function updateConfusionMatrix(){
-
-  alpha = getAlpha(crit_t_value, df);
-  beta = getBeta(crit_t_value_beta, df);
+function updateConfusionMatrix(alpha, beta){
 
   elem("alpha").innerText = round(alpha);
   elem("confidence").innerText = round(1-alpha);
@@ -504,6 +489,26 @@ function updateConfusionMatrix(){
   //elem('beta-box').style = "background-color: rgba(0, 0, 255, "+ (Math.round(beta * 1000)*0.6 / (1000)).toFixed(3) +");"
 }
 
+
+
+function showRejectOrNotReject(crit_t_value, t_value){
+  // determine recommendation: to reject or not reject the null hypothesis
+  if (crit_t_value <= t_value){
+    elem('reject-or-not').innerText = "Reject the Null Hypothesis (H\u2080)";
+    elem('reject').style.backgroundColor = "#ff3e00";
+    elem('not-reject').style.backgroundColor = "#ffffff";
+
+  } else if (crit_t_value > t_value) {
+    elem('reject-or-not').innerText = "Do Not Reject the Null Hypothesis (H\u2080)";
+    elem('reject').style.backgroundColor = "#ffffff";
+    elem('not-reject').style.backgroundColor = "#ff3e00";
+
+  } else {
+    elem('reject-or-not').innerText = " ";
+    elem('reject').style.backgroundColor = "#ffffff";
+    elem('not-reject').style.backgroundColor = "#ffffff";
+  }
+}
 
 
 function updateProbabilityTree(){

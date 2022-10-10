@@ -1,4 +1,4 @@
-function drawAlphaCurve(){
+function drawAlphaCurve(group1, crit_t_value){
     // Fill the area under the curve representing alpha.
     let alpha_curve = [];
     // this datapoint connects with the critical t vertical line
@@ -13,7 +13,7 @@ function drawAlphaCurve(){
   }
   
   
-  function drawBetaCurve(){
+  function drawBetaCurve(group2, crit_t_value){
     // Fill the area under the curve representing beta.
     let beta_curve = [];
     for(var i = 0; i < group2.dist.length; i++) {

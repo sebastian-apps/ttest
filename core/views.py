@@ -148,7 +148,7 @@ def ttest(request):
                              "effect_size": effect_size, "ncp" : ncp
                              })
 
-        test_results.update({"crit_t_init": st.norm.ppf(.95)})  # Arbitrary starting point (alpha=0.05), opposite is st.norm.cdf(1.64)
+        test_results.update({"crit_t_init": 1.8331})  # equiv to alpha=0.05. previoiusly: st.norm.ppf(.95), Arbitrary starting point (alpha=0.05), opposite is st.norm.cdf(1.64)
         axes.update({"x_min": x_min, "x_max": x_max, "y_max": y_max, "step_size": step_size})
 
 
