@@ -290,14 +290,13 @@ const prob9_netn = elem("prob9_netn");
 const prob10_nefp = elem("prob10_nefp");
 
 const ROUND_DECIMALS = 4;
-var alpha;
-var beta;
-var sliderPositionLeft;
-var df;
-var crit_t_value;
+// var alpha;
+// var beta;
+// var df;
+// var t_value;
+// var p_value;
 
-var t_value;
-var p_value;
+var crit_t_value;
 var crit_t_value_beta;  // critical t with respect to the group 2 distribution, not group 1
 
 {% if test_results %}
@@ -315,19 +314,18 @@ var crit_t_value_beta;  // critical t with respect to the group 2 distribution, 
   elem("t_value").innerText = round(t_value);  // display t-value, even as negative
   t_value = math.abs(t_value);
 
+  // Initialize
+  var lineChart = getLineChart(axes, group1, group2, p_value, crit_t_init);  // previously: crit_t_value
+  var roc_curve = getRocCurve(axes);
+  var rocChart = getROCChart(roc_curve);
+  rocChart.update();
+  elem("auc_value").innerText = getAUC(axes);
+
+  var thumb = slider.querySelector('.thumb');
+  var sliderPositionLeft = initThumb(axes.x_min, axes.x_max, thumb.offsetWidth, crit_t_init);
+  // moveBar();
+
 {% endif %}
-
-
-// Initialize
-var lineChart = getLineChart(axes, group1, group2, p_value, crit_t_init);  // previously: crit_t_value
-var roc_curve = getRocCurve(axes);
-var rocChart = getROCChart(roc_curve);
-rocChart.update();
-elem("auc_value").innerText = getAUC(axes);
-
-let thumb = slider.querySelector('.thumb');
-sliderPositionLeft = initThumb(axes.x_min, axes.x_max, thumb.offsetWidth, crit_t_init);
-// moveBar();
 
 
 
@@ -358,7 +356,7 @@ function initThumb(chart_x_min, chart_x_max, thumbOffsetWidth, crit_t_init){
   elem("slider").style.left = x1 + "px";
   elem("slider").style.width = x2 - x1 + "px";
   
-  updateState(crit_t_init, df);
+  updateState(crit_t_init, df, ncp);
 
   return new_thumb;
 }
@@ -380,15 +378,13 @@ function moveBar(){
 
   // draw the critical t vertical line
   crit_t_value = round(convertScreenXToChartX(sliderPositionLeft, x1, x2, axes.x_min, axes.x_max, thumb.offsetWidth));
-  updateState(crit_t_value, df);
+  updateState(crit_t_value, df, ncp);
 
 }
 
-function updateState(crit_t_value, df){
+function updateState(crit_t_value, df, ncp){
   // calculations
-  /* update numeric values related to critical t.
-     shift by the non-centrality parameter. */
-  crit_t_value_beta = crit_t_value - ncp;
+  crit_t_value_beta = crit_t_value - ncp;  // ncp: non-centrality parameter
   alpha = getAlpha(crit_t_value, df);
   beta = getBeta(crit_t_value_beta, df);
 
