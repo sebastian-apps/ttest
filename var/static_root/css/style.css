@@ -1,0 +1,315 @@
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  /* background-color: #ff3e00; */
+  background-color: #434343;
+  font-family: "Helvetica Neue", sans-serif;
+  font-size: 15px;
+}
+
+a:link, a:visited {
+  color: grey;
+  text-decoration: none;
+}
+
+/* mouse over link */
+a:hover {
+  color: white;
+  text-decoration: none;
+}
+
+/* selected link */
+a:active {
+  color: black;
+  text-decoration: none;
+}
+
+
+h4 {
+  font-family: "Helvetica Neue", sans-serif;
+}
+
+
+
+#ContainerWindow{
+  background-color: #fff;
+  padding: 20px 70px;
+}
+
+#WhiteWindow{
+  background-color: #fff;
+  color: #000;
+  padding: 80px 50px;
+  font-family: "Helvetica Neue", sans-serif;
+  font-size: 17px;
+}
+
+#BlackWindow{
+  background-color: #000;
+  color: #fff;
+  padding: 80px 50px;
+  font-family: "Helvetica Neue", sans-serif;
+  font-size: 17px;
+}
+
+#OrangeWindow{
+  background-image: url("/static/images/welchs.png");
+  /* background-color: #cccccc; */
+  /* height: 500px; */
+
+  /* background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  position: relative; */
+
+  /* Create the parallax scrolling effect */
+  background-attachment: fixed;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+
+  /* background-color: #ff3e00; */
+  color: #fff;
+  padding: 120px 50px 120px 50px;
+  /* font-family: "Helvetica Neue", sans-serif; */
+  font-size: 17px;
+}
+
+
+#titlename{
+  font-family: 'Trebuchet MS', sans-serif;
+  font-size: 80px;
+  /* padding: 0px 0px 0px 100px; */
+  /* margin-bottom:-120px */
+}
+#titlename-sub{
+  font-family: 'Trebuchet MS', sans-serif;
+  font-size: 70px;
+  /* padding: 0px 0px 0px 100px; */
+  /* margin-bottom:-120px */
+}
+
+.more-info {
+  padding: 10px 20px 20px 20px;
+  border: 2px solid #ff3e00;  /* previously ff7043 */
+}
+
+
+.box {
+    border: 2px solid #e8e8e8;
+    padding: 10px;
+    margin: 0px;
+    border-radius: 15px;
+  }
+  
+.asteriskField {
+    display: none;
+}
+
+
+.responsive {
+  width: 100%;
+  height: auto;
+}
+
+.slider {
+  border-radius: 5px;
+  background: #E0E0E0;
+  background: linear-gradient(left top, #E0E0E0, #EEEEEE);
+  /* width: 525px; */
+  height: 15px;
+  margin: 0px;
+  position: relative;
+}
+
+
+.thumb {
+  width: 15px;
+  height: 25px;
+  border-radius: 3px;
+  position: relative;
+  left: 0px;
+  top: -5px;
+  background: #ff3e00;
+  cursor: pointer;
+}
+
+
+.error_box {
+  background-color: #e8e8e8;
+
+}
+
+/* Probability of Real Effect */
+.prob1_re {
+  position: absolute;
+  top: 33%;
+  left: 5%;
+  border: 1px solid #ff3e00;
+}
+/* Probability of No Effect */
+.prob2_ne {
+  position: absolute;
+  top: 65%;
+  left: 5%;
+}
+/* Probability of True Positive */
+.prob3_tp {
+  position: absolute;
+  top: 20%;
+  left: 47%;
+}
+/* Probability of False Negative */
+.prob4_fn {
+  position: absolute;
+  top: 40%;
+  left: 47%;
+  color: blue;
+}
+/* Probability of True Negative  */
+.prob5_tn {
+  position: absolute;
+  top: 60%;
+  left: 47%;
+}
+/* Probability of False Positive */
+.prob6_fp {
+  position: absolute;
+  top: 80%;
+  left: 47%;
+  color: red;
+}
+/* Probability of Real Effect x True Positive */
+.prob7_retp {
+  position: absolute;
+  top: 20%;
+  left: 82%;
+}
+/* Probability of Real Effect x False Negative */
+.prob8_refn {
+  position: absolute;
+  top: 40%;
+  left: 82%;
+}
+/* Probability of No Effect x True Negative */
+.prob9_netn {
+  position: absolute;
+  top: 60%;
+  left: 82%;
+}
+/* Probability of No Effect x False Positive */
+.prob10_nefp {
+  position: absolute;
+  top: 80%;
+  left: 82%;
+}
+
+@import "compass/css3";
+
+
+* {
+  box-sizing: border-box;
+}
+
+
+::selection {
+  background-color: #4EC6DE;
+}
+
+.tabbed {
+/*  width: 700px;
+  margin: 50px auto;  */
+}
+
+.tabbed > input {
+  display: none;
+}
+
+.tabbed > label {
+  display: block;
+  float: left;
+  padding: 12px 20px;
+  margin-right: 5px;
+  margin-bottom: 0px;
+  cursor: pointer;
+  transition: background-color .3s;
+}
+
+.tabbed > label:hover,
+.tabbed > input:checked + label {
+  background: #ff3e00;
+}
+
+.tabs {
+  margin: 0px;
+  padding: 0px;
+  clear: both;
+  perspective: 600px;
+}
+
+.tabs > div {
+  /* width: 700px; */
+  position: absolute;
+  border: 2px solid #ff3e00;
+  padding: 10px 30px 40px;
+  line-height: 1.4em;
+  opacity: 0;
+  z-index: 0;
+}
+
+
+#tab-nav-1:checked ~ .tabs > div:nth-of-type(1),
+#tab-nav-2:checked ~ .tabs > div:nth-of-type(2){
+  opacity: 1;
+  z-index: 1;
+}
+#tab-nav-3:checked ~ .tabs > div:nth-of-type(3){
+  opacity: 1;
+  z-index: 1;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  background-color: #ffffff;
+  padding: 0px;
+}
+.grid-item {
+  background-color: rgba(255, 255, 255, 0.8);
+  border: 1px solid #c8c8c8;  /*rgba(0, 0, 0, 0.8);*/
+  padding: 10px;
+  text-align: center;
+}
+
+
+.diagram-box {
+  position: relative;
+  border: 1px solid #c8c8c8;
+}
+
+.enter-data{
+  border: 2px solid #c8c8c8;
+  padding: 30px;
+}
+
+/* hide for larger screens */
+#SmallScreen {
+    display: none;
+}
+
+
+/* show for small screens */
+@media screen and (max-width: 1000px) {
+    #SmallScreen {
+        display: block;
+    }
+}
+
+/* remove padding on smaller screens */
+@media screen and (max-width: 500px) {
+  #ContainerWindow{
+    padding: 50px 5px 50px 5px;
+  }
+}

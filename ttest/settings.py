@@ -130,6 +130,10 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
 ]
 
+# for Vue
+# Django will create and manage that folder for us. 
+# # When it comes time to deploy, that folder will be important.
+STATIC_ROOT = 'var/static_root/'
 
 # Settings for django-bootstrap3
 BOOTSTRAP3 = {

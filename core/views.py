@@ -10,6 +10,26 @@ import math
 import statistics
 from statsmodels.stats.power import tt_ind_solve_power
 
+
+
+def vue_test(request):
+
+    # context = { 
+    #     "form": {
+    #         "dataset1": [87, 101, 64, 86, 87, 82, 70, 85, 78, 92, 84, 88],
+    #         "dataset2": [83, 124, 86, 98, 96, 103, 89]
+    #     }, 
+    # }
+    form = DatasetsForm()
+    dataset1 = [87, 101, 64, 86, 87, 82, 70, 85, 78, 92, 84, 88]
+    # dataset2 = [83, 124, 86, 98, 96, 103, 89]
+    form.fields['dataset1'].initial = prep_for_form(dataset1)
+    context = {'form': form}
+
+    return render(request, 'core/vue-test.html', context)
+
+
+
 DEC = 4  # Round values to a constant number of decimal places.
 
 
