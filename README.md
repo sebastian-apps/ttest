@@ -2,6 +2,7 @@
 
 Is there a statistically significant difference between two datasets? Move the slider and observe the impact of the significance level on the probability of making the wrong decision. Input and explore your datasets.
 
+Great for hypothesis testing, calculating the positive predictive value, and plotting the receiver operating characteristic (ROC) curve.
 
 <br />
 
