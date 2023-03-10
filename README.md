@@ -23,16 +23,16 @@ cd ttest
 python -m venv ttest_env
 ```
 
-Activate the virtual environment for OSX.
-
-```
-source ttest_env/bin/activate
-```
-
 Activate the virtual environment for Windows.
 
 ```
 ttest_env\Scripts\activate
+```
+
+Activate the virtual environment for OSX.
+
+```
+source ttest_env/bin/activate
 ```
 
 Install dependencies. The installation works best with Python 3.7.7.
