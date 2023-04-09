@@ -42,7 +42,7 @@
   <div style="text-align:justify">
     Is there a statistically significant difference between two datasets?<p></p>
     Move the slider and observe the impact of the significance level on the probability of making the wrong decision. Input and explore your datasets.
-    This calculator is for one-tailed Welch’s <i>t</i>-tests. The data are assumed to be normally distributed.
+    This calculator is for one-tailed Welch's <i>t</i>-tests. The data are assumed to be normally distributed.
     <a href='#more-info'>Find more information.</a>
   </div>
   <p>
@@ -103,7 +103,7 @@
         </div>
         </form>
 
-        <div style="background-color: #e8e8e8; padding:10px; min-width:300px;" class="row">
+        <div class="row stats_box">
           <div class="col-xs-4">
             <span id="SmallScreen"><b>Group 1</b><br></span>
             {{ data1.mean }}<br>
@@ -176,7 +176,16 @@
               <span style="color:blue">False Negative<br>Type II Error<br>(&#946;)</span>
             </div>
           </div>
+
+          <br><br>
+          <div class="stats_box">
+            <span class="metrics_style">True Positive Rate (TPR),</span><br>Recall, Sensitivity: <b><span id="TPR"></span></b><p></p>
+            <span class="metrics_style">False Negative Rate (FNR),</span><br>Miss Rate: <b><span id="FNR"></span></b><p></p>
+            <span class="metrics_style">False Positive Rate (FPR),</span><br>Prob. False Alarm, Fall-out: <b><span id="FPR"></span></b><p></p>
+            <span class="metrics_style">True Negative Rate (TNR),</span><br>Specificity: <b><span id="TNR"></span></b>
+          </div>
         </div> <!-- end hypothesis testing -->
+
 
         <div class="tab">
           <b>Positive Predictive Value (PPV)</b>
@@ -187,26 +196,30 @@
               <div class="responsive">
                 <img class="responsive" src="{% static 'images/tree.svg' %}">
                 <input id="prob1_re" class="prob1_re" value="0.01" size="3">
-                <div id="prob2_ne" class="prob2_ne"></div><b>
-                <div id="prob3_tp" class="prob3_tp"></div>
-                <div id="prob4_fn" class="prob4_fn"></div>
-                <div id="prob5_tn" class="prob5_tn"></div>
-                <div id="prob6_fp" class="prob6_fp"></div>
-                <div id="prob7_retp" class="prob7_retp"></div>
-                <div id="prob8_refn" class="prob8_refn"></div>
-                <div id="prob9_netn" class="prob9_netn"></div>
-                <div id="prob10_nefp" class="prob10_nefp"></div></b>
+                <div id="prob_ne" class="prob_ne"></div><b>
+                <div id="prob_tp" class="prob_tp"></div>
+                <div id="prob_fn" class="prob_fn"></div>
+                <div id="prob_tn" class="prob_tn"></div>
+                <div id="prob_fp" class="prob_fp"></div>
+                <div id="prob_retp" class="prob_retp"></div>
+                <div id="prob_refn" class="prob_refn"></div>
+                <div id="prob_netn" class="prob_netn"></div>
+                <div id="prob_nefp" class="prob_nefp"></div></b>
               </div>
             </div>
             <p><br>
 
-            PPV: <b><span id="ppv"></span></b><br>
-            False Discovery Rate: <b><span id="false_rate"></span></b><br>
-            Sensitivity: <b><span id="sensitivity"></span></b><br>
-            Specificity: <b><span id="specificity"></span></b>
+            <div class="stats_box">
+              Positive Predictive Value (PPV),<br> Precision: <b><span id="ppv"></span></b><p></p>
+              False Discovery Rate (FDR): <b><span id="false_rate"></span></b><p></p>
+              False Omission Rate (FOR): <b><span id="for"></span></b><p></p>
+              Negative Predictive Value (NPV): <b><span id="npv"></span></b><p></p>
+
+              Prevalence Threshold (PT):  <b><span id="prevalence_threshold"></span></b>
+            </div>
 
 
-            <br><br><br><br>
+            <br><br>
             <div style="text-align:justify">
               For example, if 1% of the population is afflicted with a disease, and
               the test for the disease is 99% accurate, we may intuit that
@@ -248,7 +261,7 @@
   <div class="more-info">
     <h4>More information</h4>
 
-    The Welch’s <i>t</i>-test, or unequal variances <i>t</i>-test, can test hypotheses such as whether the means of two independent normally-distributed populations are equal. While the commonly-used Student <i>t</i>-test requires that the two samples share equal variances and equal sample sizes, the Welch’s <i>t</i>-test does not have this requirement. Researchers argue that the Welch’s <i>t</i>-test is more versatile and should instead be used by default.<sup>1,2</sup>
+    The Welch's <i>t</i>-test, or unequal variances <i>t</i>-test, can test hypotheses such as whether the means of two independent normally-distributed populations are equal. While the commonly-used Student <i>t</i>-test requires that the two samples share equal variances and equal sample sizes, the Welch’s <i>t</i>-test does not have this requirement. Researchers argue that the Welch’s <i>t</i>-test is more versatile and should instead be used by default.<sup>1,2</sup>
     <br><br>
     Statistical rigor can be achieved with <i>t</i>-tests, yet the significance level is set arbitrarily. While lowering significance levels mitigates false positives (&#945;), the probability of false negatives (&#946;) increases, and tests may fail to detect existing effects.<sup>3</sup>
   </div>
@@ -277,16 +290,16 @@
 
 <script>
 
-const prob1_re = elem("prob1_re");
-const prob2_ne = elem("prob2_ne");
-const prob3_tp = elem("prob3_tp");
-const prob4_fn = elem("prob4_fn");
-const prob5_tn = elem("prob5_tn");
-const prob6_fp = elem("prob6_fp");
-const prob7_retp = elem("prob7_retp");
-const prob8_refn = elem("prob8_refn");
-const prob9_netn = elem("prob9_netn");
-const prob10_nefp = elem("prob10_nefp");
+// const prob1_re = elem("prob1_re");
+// const prob_ne = elem("prob_ne");
+// const prob_tp = elem("prob_tp");
+// const prob_fn = elem("prob_fn");
+// const prob_tn = elem("prob_tn");
+// const prob_fp = elem("prob_fp");
+// const prob_retp = elem("prob_retp");
+// const prob_refn = elem("prob_refn");
+// const prob_netn = elem("prob_netn");
+// const prob_nefp = elem("prob_nefp");
 
 const ROUND_DECIMALS = 4;
 
@@ -377,11 +390,50 @@ function moveBar(){
 
 }
 
+
 function updateState(crit_t_value, df, ncp){
   // calculations
   crit_t_value_beta = crit_t_value - ncp;  // ncp: non-centrality parameter
   alpha = getAlpha(crit_t_value, df);
   beta = getBeta(crit_t_value_beta, df);
+  confidence = 1-alpha;
+  power = 1-beta;
+
+  // prob1_re is prevalence input
+  if ((prob1_re.value >= 0) && (prob1_re.value <= 1)) {
+    ne = 1-prob1_re.value;
+    tp = 1-beta;
+    fn = beta;
+    tn = 1-alpha;
+    fp = alpha;
+
+    tpr = tp;
+    fnr = 1-tp;
+    fpr = 1-tn;
+    tnr = tn;
+
+    retp = prob1_re.value*tp;
+    refn = prob1_re.value*fn;
+    netn = ne*tn;
+    nefp = ne*fp;
+
+    // Calculate the False Discovery Rate (FDR)
+    fdr = getFalseDiscoveryRate(nefp, retp);
+    // Calculate the Positive Predictive Value (PPV)
+    ppv = 100 - fdr;
+    // Calculate the False OmissionRate (FOR)
+    falseomrate = getFalseOmissionRate(refn, netn);
+    // Calculate the Negative Predictive Value (NPV)
+    npv = 100 - falseomrate;
+
+    // Calculate prevalence threshold
+    prevalence_threshold = (math.sqrt(tpr*fpr)-fpr)/(tpr-fpr)
+
+
+
+  }
+
+
 
   // update display
   elem('crit_t_value').innerText = crit_t_value;
@@ -462,10 +514,21 @@ function moveThumbMobile(event) {
 
 function updateConfusionMatrix(alpha, beta){
 
+  // DELETE THIS
+  // elem("alpha").innerText = round(alpha);
+  // elem("confidence").innerText = round(1-alpha);
+  // elem("beta").innerText = round(beta);
+  // elem("power").innerText = round(1-beta);
+
   elem("alpha").innerText = round(alpha);
-  elem("confidence").innerText = round(1-alpha);
+  elem("confidence").innerText = round(confidence);
   elem("beta").innerText = round(beta);
-  elem("power").innerText = round(1-beta);
+  elem("power").innerText = round(power);
+
+  elem("TPR").innerText = round(tpr);
+  elem("FNR").innerText = round(fnr);
+  elem("FPR").innerText = round(fpr);
+  elem("TNR").innerText = round(tnr);
 
   // update line chart
   lineChart.options.annotation.annotations[1].label['content'] = '\u03B1 = ' + round(alpha);
@@ -504,38 +567,90 @@ function showRejectOrNotReject(crit_t_value, t_value){
 
 function updateProbabilityTree(){
 
+  // great resource for testing: https://www.medcalc.org/calc/diagnostic_test.php
+
   if ((prob1_re.value >= 0) && (prob1_re.value <= 1)) {
-    prob2_ne.innerText = round(1 - prob1_re.value);
-    prob3_tp.innerText = round(1 - beta);
-    prob4_fn.innerText = round(beta);
-    prob5_tn.innerText = round(1 - alpha);
-    prob6_fp.innerText = round(alpha);
-    prob7_retp.innerText = round(prob1_re.value * prob3_tp.innerText);
-    prob8_refn.innerText = round(prob1_re.value * prob4_fn.innerText);
-    prob9_netn.innerText = round(prob2_ne.innerText * prob5_tn.innerText);
-    prob10_nefp.innerText = round(prob2_ne.innerText * prob6_fp.innerText);
 
-    // Calculate the False Discovery Rate (FDR)
-    let fdr = getFalseDiscoveryRate(parseFloat(prob10_nefp.innerText), parseFloat(prob7_retp.innerText));
-    // Calculate the Positive Predictive Value (PPV)
-    let ppv = math.round(100 - fdr,2);
+    // DELETE THIS
+    // prob_ne.innerText = round(1 - prob1_re.value);
+    // prob_tp.innerText = round(1 - beta);
+    // prob_fn.innerText = round(beta);
+    // prob_tn.innerText = round(1 - alpha);
+    // prob_fp.innerText = round(alpha);
+    // prob_retp.innerText = round(prob1_re.value * prob_tp.innerText);
+    // prob_refn.innerText = round(prob1_re.value * prob_fn.innerText);
+    // prob_netn.innerText = round(prob_ne.innerText * prob_tn.innerText);
+    // prob_nefp.innerText = round(prob_ne.innerText * prob_fp.innerText);
 
-    if (Number.isNaN(fdr)){
-      fdr = " - ";
-    }
-    if (Number.isNaN(ppv)){
-      ppv = " - ";
-    }
+    // prob_ne.innerText = round(ne);
+    // prob_tp.innerText = round(tp);
+    // prob_fn.innerText = round(fn);
+    // prob_tn.innerText = round(tn);
+    // prob_fp.innerText = round(fp);
+    // prob_retp.innerText = round(retp);
+    // prob_refn.innerText = round(refn);
+    // prob_netn.innerText = round(netn);
+    // prob_nefp.innerText = round(nefp);
 
-    elem("false_rate").innerText = fdr + "%";
-    elem("ppv").innerText = ppv + "%";
-    elem("sensitivity").innerText = prob3_tp.innerText;
-    elem("specificity").innerText = prob5_tn.innerText;
+
+    elem("prob_ne").innerText = round(ne);
+    elem("prob_tp").innerText = round(tp);
+    elem("prob_fn").innerText = round(fn);
+    elem("prob_tn").innerText = round(tn);
+    elem("prob_fp").innerText = round(fp);
+    elem("prob_retp").innerText = round(retp);
+    elem("prob_refn").innerText = round(refn);
+    elem("prob_netn").innerText = round(netn);
+    elem("prob_nefp").innerText = round(nefp);
+
+    //   const prob1_re = elem("prob1_re");
+    // const prob_ne = elem("prob_ne");
+    // const prob_tp = elem("prob_tp");
+    // const prob_fn = elem("prob_fn");
+    // const prob_tn = elem("prob_tn");
+    // const prob_fp = elem("prob_fp");
+    // const prob_retp = elem("prob_retp");
+    // const prob_refn = elem("prob_refn");
+    // const prob_netn = elem("prob_netn");
+    // const prob_nefp = elem("prob_nefp");
+
+    // // DEELTE THIS
+    // // Calculate the False Discovery Rate (FDR)
+    // let fdr = cleanNaN(getFalseDiscoveryRate(parseFloat(prob_nefp.innerText), parseFloat(prob_retp.innerText)));
+    // // Calculate the Positive Predictive Value (PPV)
+    // let ppv = cleanNaN(math.round(100 - fdr,2));
+    // // Calculate the False OmissionRate (FOR)
+    // let falseomrate = cleanNaN(getFalseOmissionRate(parseFloat(prob_refn.innerText), parseFloat(prob_netn.innerText)));
+    // // Calculate the Negative Predictive Value (NPV)
+    // let npv = cleanNaN(math.round(100 - falseomrate,2));
+
+    elem("ppv").innerText = cleanNaN(math.round(ppv, 2)) + "%";
+    elem("false_rate").innerText = cleanNaN(math.round(fdr, 2)) + "%";
+    elem("for").innerText = cleanNaN(math.round(falseomrate, 2)) + "%";
+    elem("npv").innerText = cleanNaN(math.round(npv, 2)) + "%";  
+
+      // DELETE THIS
+    // // move to updateConfusionMatrix() function?
+    // elem("TPR").innerText = prob_tp.innerText;
+    // elem("FNR").innerText = round(1 - prob_tp.innerText);
+    // elem("FPR").innerText = round(1 - prob_tn.innerText);
+    // elem("TNR").innerText = prob_tn.innerText;
+
+    // not best practice calculating form elements. improve state update method.
+    // elem("accuracy").innerText = "";
+    elem("prevalence_threshold").innerText = round(prevalence_threshold)
+
   }
 }
 
 
-
+function cleanNaN(val){
+  if (Number.isNaN(val)){ 
+    return " - "; 
+  } else {
+    return val;
+  }
+}
 
 function clearForm() {
   elem("id_dataset1").value = '';
@@ -545,7 +660,8 @@ function clearForm() {
 
 elem("prob1_re").onkeypress = function(event){
     if (event.keyCode == 13 || event.which == 13){
-        updateProbabilityTree();
+      updateState(crit_t_value, df, ncp);
+      // updateProbabilityTree();
     }
 };
 

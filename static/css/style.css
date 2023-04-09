@@ -150,57 +150,57 @@ h4 {
   border: 1px solid #ff3e00;
 }
 /* Probability of No Effect */
-.prob2_ne {
+.prob_ne {
   position: absolute;
   top: 65%;
   left: 5%;
 }
 /* Probability of True Positive */
-.prob3_tp {
+.prob_tp {
   position: absolute;
   top: 20%;
   left: 47%;
 }
 /* Probability of False Negative */
-.prob4_fn {
+.prob_fn {
   position: absolute;
   top: 40%;
   left: 47%;
   color: blue;
 }
 /* Probability of True Negative  */
-.prob5_tn {
+.prob_tn {
   position: absolute;
   top: 60%;
   left: 47%;
 }
 /* Probability of False Positive */
-.prob6_fp {
+.prob_fp {
   position: absolute;
   top: 80%;
   left: 47%;
   color: red;
 }
 /* Probability of Real Effect x True Positive */
-.prob7_retp {
+.prob_retp {
   position: absolute;
   top: 20%;
   left: 82%;
 }
 /* Probability of Real Effect x False Negative */
-.prob8_refn {
+.prob_refn {
   position: absolute;
   top: 40%;
   left: 82%;
 }
 /* Probability of No Effect x True Negative */
-.prob9_netn {
+.prob_netn {
   position: absolute;
   top: 60%;
   left: 82%;
 }
 /* Probability of No Effect x False Positive */
-.prob10_nefp {
+.prob_nefp {
   position: absolute;
   top: 80%;
   left: 82%;
@@ -293,6 +293,20 @@ h4 {
   border: 2px solid #c8c8c8;
   padding: 30px;
 }
+
+.metrics_style{
+  /* color: #656565; */
+  /* font-weight: bold;  */
+}
+
+
+
+.stats_box{
+  background-color: #e8e8e8; 
+  padding:10px; 
+  min-width:300px;
+}
+
 
 /* hide for larger screens */
 #SmallScreen {

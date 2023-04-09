@@ -91,8 +91,17 @@ function getFalseDiscoveryRate(FP, TP){
   FP: False Positive
   TP: True Positive
   */
-  return math.round(100*FP/(FP + TP),2);
+  return 100*FP/(FP + TP);
 }
+
+function getFalseOmissionRate(FN, TN){
+  /*Calculate the False Omission Rate (FOR)
+  FN: False Negative
+  TN: True Negative
+  */
+  return 100*FN/(TN + FN);
+}
+
 
 
 
