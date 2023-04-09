@@ -290,20 +290,7 @@
 
 <script>
 
-// const prob1_re = elem("prob1_re");
-// const prob_ne = elem("prob_ne");
-// const prob_tp = elem("prob_tp");
-// const prob_fn = elem("prob_fn");
-// const prob_tn = elem("prob_tn");
-// const prob_fp = elem("prob_fp");
-// const prob_retp = elem("prob_retp");
-// const prob_refn = elem("prob_refn");
-// const prob_netn = elem("prob_netn");
-// const prob_nefp = elem("prob_nefp");
-
 const ROUND_DECIMALS = 4;
-
-
 var crit_t_value;
 var crit_t_value_beta;  // critical t with respect to the group 2 distribution, not group 1
 
@@ -355,7 +342,7 @@ function initThumb(chart_x_min, chart_x_max, thumbOffsetWidth, crit_t_init){
   var x2 = points[1]._model.x;
 
   // convert chart x value to the x screen position for the slider thumb
-  var offset = thumb.offsetWidth/2; //.59;  // previously: offset=3
+  var offset = thumb.offsetWidth/2; 
   var new_thumb = convertChartXToScreenX(crit_t_init, chart_x_min, chart_x_max, x1, x2, offset);
   elem("thumb").style.left = new_thumb + "px";
 
@@ -399,39 +386,32 @@ function updateState(crit_t_value, df, ncp){
   confidence = 1-alpha;
   power = 1-beta;
 
-  // prob1_re is prevalence input
-  if ((prob1_re.value >= 0) && (prob1_re.value <= 1)) {
-    ne = 1-prob1_re.value;
-    tp = 1-beta;
-    fn = beta;
-    tn = 1-alpha;
-    fp = alpha;
+  ne = 1-prob1_re.value;
+  tp = 1-beta;
+  fn = beta;
+  tn = 1-alpha;
+  fp = alpha;
 
-    tpr = tp;
-    fnr = 1-tp;
-    fpr = 1-tn;
-    tnr = tn;
+  tpr = tp;
+  fnr = 1-tp;
+  fpr = 1-tn;
+  tnr = tn;
 
-    retp = prob1_re.value*tp;
-    refn = prob1_re.value*fn;
-    netn = ne*tn;
-    nefp = ne*fp;
+  retp = prob1_re.value*tp;
+  refn = prob1_re.value*fn;
+  netn = ne*tn;
+  nefp = ne*fp;
 
-    // Calculate the False Discovery Rate (FDR)
-    fdr = getFalseDiscoveryRate(nefp, retp);
-    // Calculate the Positive Predictive Value (PPV)
-    ppv = 100 - fdr;
-    // Calculate the False OmissionRate (FOR)
-    falseomrate = getFalseOmissionRate(refn, netn);
-    // Calculate the Negative Predictive Value (NPV)
-    npv = 100 - falseomrate;
-
-    // Calculate prevalence threshold
-    prevalence_threshold = (math.sqrt(tpr*fpr)-fpr)/(tpr-fpr)
-
-
-
-  }
+  // Calculate the False Discovery Rate (FDR)
+  fdr = getFalseDiscoveryRate(nefp, retp);
+  // Calculate the Positive Predictive Value (PPV)
+  ppv = 100 - fdr;
+  // Calculate the False OmissionRate (FOR)
+  falseomrate = getFalseOmissionRate(refn, netn);
+  // Calculate the Negative Predictive Value (NPV)
+  npv = 100 - falseomrate;
+  // Calculate prevalence threshold
+  prevalence_threshold = (math.sqrt(tpr*fpr)-fpr)/(tpr-fpr)
 
 
 
@@ -514,12 +494,6 @@ function moveThumbMobile(event) {
 
 function updateConfusionMatrix(alpha, beta){
 
-  // DELETE THIS
-  // elem("alpha").innerText = round(alpha);
-  // elem("confidence").innerText = round(1-alpha);
-  // elem("beta").innerText = round(beta);
-  // elem("power").innerText = round(1-beta);
-
   elem("alpha").innerText = round(alpha);
   elem("confidence").innerText = round(confidence);
   elem("beta").innerText = round(beta);
@@ -568,79 +542,22 @@ function showRejectOrNotReject(crit_t_value, t_value){
 function updateProbabilityTree(){
 
   // great resource for testing: https://www.medcalc.org/calc/diagnostic_test.php
+  elem("prob_ne").innerText = round(ne);
+  elem("prob_tp").innerText = round(tp);
+  elem("prob_fn").innerText = round(fn);
+  elem("prob_tn").innerText = round(tn);
+  elem("prob_fp").innerText = round(fp);
+  elem("prob_retp").innerText = round(retp);
+  elem("prob_refn").innerText = round(refn);
+  elem("prob_netn").innerText = round(netn);
+  elem("prob_nefp").innerText = round(nefp);
 
-  if ((prob1_re.value >= 0) && (prob1_re.value <= 1)) {
+  elem("ppv").innerText = cleanNaN(math.round(ppv, 2)) + "%";
+  elem("false_rate").innerText = cleanNaN(math.round(fdr, 2)) + "%";
+  elem("for").innerText = cleanNaN(math.round(falseomrate, 2)) + "%";
+  elem("npv").innerText = cleanNaN(math.round(npv, 2)) + "%";  
+  elem("prevalence_threshold").innerText = cleanNaN(round(prevalence_threshold));
 
-    // DELETE THIS
-    // prob_ne.innerText = round(1 - prob1_re.value);
-    // prob_tp.innerText = round(1 - beta);
-    // prob_fn.innerText = round(beta);
-    // prob_tn.innerText = round(1 - alpha);
-    // prob_fp.innerText = round(alpha);
-    // prob_retp.innerText = round(prob1_re.value * prob_tp.innerText);
-    // prob_refn.innerText = round(prob1_re.value * prob_fn.innerText);
-    // prob_netn.innerText = round(prob_ne.innerText * prob_tn.innerText);
-    // prob_nefp.innerText = round(prob_ne.innerText * prob_fp.innerText);
-
-    // prob_ne.innerText = round(ne);
-    // prob_tp.innerText = round(tp);
-    // prob_fn.innerText = round(fn);
-    // prob_tn.innerText = round(tn);
-    // prob_fp.innerText = round(fp);
-    // prob_retp.innerText = round(retp);
-    // prob_refn.innerText = round(refn);
-    // prob_netn.innerText = round(netn);
-    // prob_nefp.innerText = round(nefp);
-
-
-    elem("prob_ne").innerText = round(ne);
-    elem("prob_tp").innerText = round(tp);
-    elem("prob_fn").innerText = round(fn);
-    elem("prob_tn").innerText = round(tn);
-    elem("prob_fp").innerText = round(fp);
-    elem("prob_retp").innerText = round(retp);
-    elem("prob_refn").innerText = round(refn);
-    elem("prob_netn").innerText = round(netn);
-    elem("prob_nefp").innerText = round(nefp);
-
-    //   const prob1_re = elem("prob1_re");
-    // const prob_ne = elem("prob_ne");
-    // const prob_tp = elem("prob_tp");
-    // const prob_fn = elem("prob_fn");
-    // const prob_tn = elem("prob_tn");
-    // const prob_fp = elem("prob_fp");
-    // const prob_retp = elem("prob_retp");
-    // const prob_refn = elem("prob_refn");
-    // const prob_netn = elem("prob_netn");
-    // const prob_nefp = elem("prob_nefp");
-
-    // // DEELTE THIS
-    // // Calculate the False Discovery Rate (FDR)
-    // let fdr = cleanNaN(getFalseDiscoveryRate(parseFloat(prob_nefp.innerText), parseFloat(prob_retp.innerText)));
-    // // Calculate the Positive Predictive Value (PPV)
-    // let ppv = cleanNaN(math.round(100 - fdr,2));
-    // // Calculate the False OmissionRate (FOR)
-    // let falseomrate = cleanNaN(getFalseOmissionRate(parseFloat(prob_refn.innerText), parseFloat(prob_netn.innerText)));
-    // // Calculate the Negative Predictive Value (NPV)
-    // let npv = cleanNaN(math.round(100 - falseomrate,2));
-
-    elem("ppv").innerText = cleanNaN(math.round(ppv, 2)) + "%";
-    elem("false_rate").innerText = cleanNaN(math.round(fdr, 2)) + "%";
-    elem("for").innerText = cleanNaN(math.round(falseomrate, 2)) + "%";
-    elem("npv").innerText = cleanNaN(math.round(npv, 2)) + "%";  
-
-      // DELETE THIS
-    // // move to updateConfusionMatrix() function?
-    // elem("TPR").innerText = prob_tp.innerText;
-    // elem("FNR").innerText = round(1 - prob_tp.innerText);
-    // elem("FPR").innerText = round(1 - prob_tn.innerText);
-    // elem("TNR").innerText = prob_tn.innerText;
-
-    // not best practice calculating form elements. improve state update method.
-    // elem("accuracy").innerText = "";
-    elem("prevalence_threshold").innerText = round(prevalence_threshold)
-
-  }
 }
 
 
@@ -660,14 +577,19 @@ function clearForm() {
 
 elem("prob1_re").onkeypress = function(event){
     if (event.keyCode == 13 || event.which == 13){
-      updateState(crit_t_value, df, ncp);
-      // updateProbabilityTree();
+      if ((prob1_re.value >= 0) && (prob1_re.value <= 1)) {
+        updateState(crit_t_value, df, ncp);
+      }
+      else {
+        // Error: outside of range. Revert to default: 0.01.
+        prob1_re.value=0.01;
+      }
     }
 };
 
 
 $(window).resize(function(e) {
-  // moveBar();
+  moveBar();
 });
 
 
