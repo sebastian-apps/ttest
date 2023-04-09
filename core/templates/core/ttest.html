@@ -380,6 +380,9 @@ function moveBar(){
 
 function updateState(crit_t_value, df, ncp){
   // calculations
+  // great resources for testing: https://www.medcalc.org/calc/diagnostic_test.php
+  // https://onlineconfusionmatrix.com/
+  
   crit_t_value_beta = crit_t_value - ncp;  // ncp: non-centrality parameter
   alpha = getAlpha(crit_t_value, df);
   beta = getBeta(crit_t_value_beta, df);
@@ -427,6 +430,7 @@ function updateState(crit_t_value, df, ncp){
   updateConfusionMatrix(alpha, beta);
   showRejectOrNotReject(crit_t_value, t_value);
   updateProbabilityTree();
+
 }
 
 
@@ -541,7 +545,6 @@ function showRejectOrNotReject(crit_t_value, t_value){
 
 function updateProbabilityTree(){
 
-  // great resource for testing: https://www.medcalc.org/calc/diagnostic_test.php
   elem("prob_ne").innerText = round(ne);
   elem("prob_tp").innerText = round(tp);
   elem("prob_fn").innerText = round(fn);
