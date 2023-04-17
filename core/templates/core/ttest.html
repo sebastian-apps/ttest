@@ -103,7 +103,7 @@
         </div>
         </form>
 
-        <div class="row stats_box">
+        <div class="row stats-box">
           <div class="col-xs-4">
             <span id="SmallScreen"><b>Group 1</b><br></span>
             {{ data1.mean }}<br>
@@ -178,12 +178,19 @@
           </div>
 
           <br><br>
-          <div class="stats_box">
+          <div class="stats-box">
             <span class="metrics_style">True Positive Rate (TPR),</span><br>Recall, Sensitivity: <b><span id="TPR"></span></b><p></p>
             <span class="metrics_style">False Negative Rate (FNR),</span><br>Miss Rate: <b><span id="FNR"></span></b><p></p>
             <span class="metrics_style">False Positive Rate (FPR),</span><br>Prob. False Alarm, Fall-out: <b><span id="FPR"></span></b><p></p>
             <span class="metrics_style">True Negative Rate (TNR),</span><br>Specificity: <b><span id="TNR"></span></b>
           </div>
+          <br>
+
+          <div class="boundary-box">
+            F1 Score: <b><span id="f1_score"></span></b><p></p>
+            Matthews Correlation Coefficient: <b><span id="matthews_cc"></span></b>
+          </div>
+
         </div> <!-- end hypothesis testing -->
 
 
@@ -195,7 +202,7 @@
             <div class="diagram-box">
               <div class="responsive">
                 <img class="responsive" src="{% static 'images/tree.svg' %}">
-                <input id="prob1_re" class="prob1_re" value="0.01" size="3">
+                <input id="prob_re" class="prob_re" value="0.01" size="3">
                 <div id="prob_ne" class="prob_ne"></div><b>
                 <div id="prob_tp" class="prob_tp"></div>
                 <div id="prob_fn" class="prob_fn"></div>
@@ -209,7 +216,7 @@
             </div>
             <p><br>
 
-            <div class="stats_box">
+            <div class="stats-box">
               Positive Predictive Value (PPV),<br> Precision: <b><span id="ppv"></span></b><p></p>
               False Discovery Rate (FDR): <b><span id="false_rate"></span></b><p></p>
               False Omission Rate (FOR): <b><span id="for"></span></b><p></p>
@@ -217,9 +224,15 @@
 
               Prevalence Threshold (PT):  <b><span id="prevalence_threshold"></span></b>
             </div>
+            <br>
 
+            <div class="boundary-box">
+              Population Prevalence: <b><span id="population_prevalence"></span></b><p></p>
+              Dataset Prevalence: <b><span id="dataset_prevalence"></span></b><p></p>
+              Dataset Accuracy: <b><span id="accuracy"></span></b>
+            </div>
 
-            <br><br>
+            <br>
             <div style="text-align:justify">
               For example, if 1% of the population is afflicted with a disease, and
               the test for the disease is 99% accurate, we may intuit that
@@ -389,33 +402,39 @@ function updateState(crit_t_value, df, ncp){
   confidence = 1-alpha;
   power = 1-beta;
 
-  ne = 1-prob1_re.value;
-  tp = 1-beta;
-  fn = beta;
-  tn = 1-alpha;
-  fp = alpha;
+  tp = 1-beta; // false positives
+  fn = beta;  // false negatives
+  tn = 1-alpha;  // true negatives
+  fp = alpha;  // false positives
+  
+  tpr = tp;  // true positive rate
+  fnr = 1-tp;  // false negative rate
+  fpr = 1-tn;  // false positive rate
+  tnr = tn;  // true negative rate
+  
+  population_prevalence = prob_re.value;
+  ne = 1-population_prevalence;  // no effect probability 
+  retp = population_prevalence*tp;  // real effect true positive
+  refn = population_prevalence*fn;  // real effect false negative
+  netn = ne*tn;  // no effect true negative
+  nefp = ne*fp;  // no effect false positive
 
-  tpr = tp;
-  fnr = 1-tp;
-  fpr = 1-tn;
-  tnr = tn;
-
-  retp = prob1_re.value*tp;
-  refn = prob1_re.value*fn;
-  netn = ne*tn;
-  nefp = ne*fp;
+  f1_score = (2*tp) / (2*tp + fp + fn); 
+  matthews_cc = (tp*tn - fp*fn) / math.sqrt((tp+fp)*(tp+fn)*(tn+fp)*(tn+fn));
 
   // Calculate the False Discovery Rate (FDR)
   fdr = getFalseDiscoveryRate(nefp, retp);
   // Calculate the Positive Predictive Value (PPV)
-  ppv = 100 - fdr;
+  ppv = 1 - fdr;
   // Calculate the False OmissionRate (FOR)
   falseomrate = getFalseOmissionRate(refn, netn);
   // Calculate the Negative Predictive Value (NPV)
-  npv = 100 - falseomrate;
+  npv = 1 - falseomrate;
   // Calculate prevalence threshold
-  prevalence_threshold = (math.sqrt(tpr*fpr)-fpr)/(tpr-fpr)
-
+  prevalence_threshold = (math.sqrt(tpr*fpr)-fpr)/(tpr-fpr);
+  
+  dataset_prevalence = (tp + fn)/2;
+  accuracy = (tp+tn)/2;
 
 
   // update display
@@ -430,6 +449,7 @@ function updateState(crit_t_value, df, ncp){
   updateConfusionMatrix(alpha, beta);
   showRejectOrNotReject(crit_t_value, t_value);
   updateProbabilityTree();
+  updateROCCurve(alpha, beta);
 
 }
 
@@ -508,19 +528,23 @@ function updateConfusionMatrix(alpha, beta){
   elem("FPR").innerText = round(fpr);
   elem("TNR").innerText = round(tnr);
 
+  elem("f1_score").innerText = round(f1_score);
+  elem("matthews_cc").innerText = round(matthews_cc);
+
   // update line chart
   lineChart.options.annotation.annotations[1].label['content'] = '\u03B1 = ' + round(alpha);
   lineChart.update();
-
-  // update ROC curve
-  rocChart.data.datasets[1]['data'] = [{x: alpha, y: 1-beta}];
-  rocChart.update();
 
   // Option to have Hypothesis Testing boxes change color intensity according to magnitude of alpha and beta probability
   //elem('alpha-box').style = "background-color: rgba(255, 0, 0, "+ (Math.round(alpha * 1000)*0.6 / (1000)).toFixed(3) +");"
   //elem('beta-box').style = "background-color: rgba(0, 0, 255, "+ (Math.round(beta * 1000)*0.6 / (1000)).toFixed(3) +");"
 }
 
+function updateROCCurve(alpha, beta){
+  // update ROC curve
+  rocChart.data.datasets[1]['data'] = [{x: alpha, y: 1-beta}];
+  rocChart.update();
+}
 
 
 function showRejectOrNotReject(crit_t_value, t_value){
@@ -555,12 +579,16 @@ function updateProbabilityTree(){
   elem("prob_netn").innerText = round(netn);
   elem("prob_nefp").innerText = round(nefp);
 
-  elem("ppv").innerText = cleanNaN(math.round(ppv, 2)) + "%";
-  elem("false_rate").innerText = cleanNaN(math.round(fdr, 2)) + "%";
-  elem("for").innerText = cleanNaN(math.round(falseomrate, 2)) + "%";
-  elem("npv").innerText = cleanNaN(math.round(npv, 2)) + "%";  
+  elem("ppv").innerText = cleanNaN(round(ppv));
+  elem("false_rate").innerText = cleanNaN(round(fdr));
+  elem("for").innerText = cleanNaN(round(falseomrate));
+  elem("npv").innerText = cleanNaN(round(npv));  
+
   elem("prevalence_threshold").innerText = cleanNaN(round(prevalence_threshold));
 
+  elem("population_prevalence").innerText = cleanNaN(round(population_prevalence));
+  elem("dataset_prevalence").innerText = cleanNaN(round(dataset_prevalence));
+  elem("accuracy").innerText = cleanNaN(round(accuracy));
 }
 
 
@@ -578,14 +606,14 @@ function clearForm() {
 }
 
 
-elem("prob1_re").onkeypress = function(event){
+elem("prob_re").onkeypress = function(event){
     if (event.keyCode == 13 || event.which == 13){
-      if ((prob1_re.value >= 0) && (prob1_re.value <= 1)) {
+      if ((prob_re.value >= 0) && (prob_re.value <= 1)) {
         updateState(crit_t_value, df, ncp);
       }
       else {
         // Error: outside of range. Revert to default: 0.01.
-        prob1_re.value=0.01;
+        prob_re.value=0.01;
       }
     }
 };

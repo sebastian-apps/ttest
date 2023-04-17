@@ -91,7 +91,7 @@ function getFalseDiscoveryRate(FP, TP){
   FP: False Positive
   TP: True Positive
   */
-  return 100*FP/(FP + TP);
+  return FP/(FP + TP);
 }
 
 function getFalseOmissionRate(FN, TN){
@@ -99,7 +99,7 @@ function getFalseOmissionRate(FN, TN){
   FN: False Negative
   TN: True Negative
   */
-  return 100*FN/(TN + FN);
+  return FN/(TN + FN);
 }
 
 
@@ -130,7 +130,8 @@ function computeArea(x, df) {
 		// tcdf=round(tcdf*100000)/100000;
 		// tcdf=tcdf*100000/100000;
 	}
-    return round(tcdf);
+    // return round(tcdf);
+    return tcdf;
 }
 
 
