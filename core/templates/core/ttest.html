@@ -188,7 +188,8 @@
 
           <div class="boundary-box">
             F1 Score: <b><span id="f1_score"></span></b><p></p>
-            Matthews Correlation Coefficient: <b><span id="matthews_cc"></span></b>
+            Matthews Correlation Coefficient: <b><span id="matthews_cc"></span></b><p></p>
+            Diagnostic Odds Ratio: <b><span id="diagnostic_odds_ratio"></span></b>
           </div>
 
         </div> <!-- end hypothesis testing -->
@@ -412,15 +413,16 @@ function updateState(crit_t_value, df, ncp){
   fpr = 1-tn;  // false positive rate
   tnr = tn;  // true negative rate
   
+  f1_score = (2*tp) / (2*tp + fp + fn); 
+  matthews_cc = (tp*tn - fp*fn) / math.sqrt((tp+fp)*(tp+fn)*(tn+fp)*(tn+fn));
+  diagnostic_odds_ratio = (tp*tn)/(fp*fn)
+
   population_prevalence = prob_re.value;
   ne = 1-population_prevalence;  // no effect probability 
   retp = population_prevalence*tp;  // real effect true positive
   refn = population_prevalence*fn;  // real effect false negative
   netn = ne*tn;  // no effect true negative
   nefp = ne*fp;  // no effect false positive
-
-  f1_score = (2*tp) / (2*tp + fp + fn); 
-  matthews_cc = (tp*tn - fp*fn) / math.sqrt((tp+fp)*(tp+fn)*(tn+fp)*(tn+fn));
 
   // Calculate the False Discovery Rate (FDR)
   fdr = getFalseDiscoveryRate(nefp, retp);
@@ -530,6 +532,7 @@ function updateConfusionMatrix(alpha, beta){
 
   elem("f1_score").innerText = round(f1_score);
   elem("matthews_cc").innerText = round(matthews_cc);
+  elem("diagnostic_odds_ratio").innerText = round(diagnostic_odds_ratio);
 
   // update line chart
   lineChart.options.annotation.annotations[1].label['content'] = '\u03B1 = ' + round(alpha);
@@ -609,7 +612,7 @@ function clearForm() {
 elem("prob_re").onkeypress = function(event){
     if (event.keyCode == 13 || event.which == 13){
       if ((prob_re.value >= 0) && (prob_re.value <= 1)) {
-        updateState(crit_t_value, df, ncp);
+        moveBar();
       }
       else {
         // Error: outside of range. Revert to default: 0.01.
