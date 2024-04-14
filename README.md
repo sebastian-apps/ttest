@@ -29,7 +29,7 @@ Activate the virtual environment for Windows.
 ttest_env\Scripts\activate
 ```
 
-Activate the virtual environment for OSX.
+Activate the virtual environment for Mac.
 
 ```
 source ttest_env/bin/activate
