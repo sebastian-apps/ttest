@@ -139,7 +139,7 @@
       <input type="radio" name="tabs" id="tab-nav-2">
       <label for="tab-nav-2">PPV</label>
       <input type="radio" name="tabs" id="tab-nav-3">
-      <label for="tab-nav-3">ROC</label>
+      <label for="tab-nav-3">AUC</label>
 
       <div class="tabs">
 
@@ -187,9 +187,7 @@
           <br>
 
           <div class="boundary-box">
-            F1 Score: <b><span id="f1_score"></span></b><p></p>
-            Matthews Correlation Coefficient: <b><span id="matthews_cc"></span></b><p></p>
-            Diagnostic Odds Ratio: <b><span id="diagnostic_odds_ratio"></span></b>
+          F1 Score: <b><span id="f1_score"></span></b>
           </div>
 
         </div> <!-- end hypothesis testing -->
@@ -228,9 +226,7 @@
             <br>
 
             <div class="boundary-box">
-              Population Prevalence: <b><span id="population_prevalence"></span></b><p></p>
-              Dataset Prevalence: <b><span id="dataset_prevalence"></span></b><p></p>
-              Dataset Accuracy: <b><span id="accuracy"></span></b>
+            Balanced Accuracy: <b><span id="balanced_accuracy"></span></b>
             </div>
 
             <br>
@@ -245,13 +241,21 @@
 
         <div class="tab">
           <b>Receiver Operating Characteristic (ROC)</b>
-          <br><br>
-          <div class="responsive" class="chart-container">
-            <canvas id="roc_curve" height="100%" width="100%"></canvas>
-          </div>
+          <div>
+            <br><br>
+            <div class="responsive" class="chart-container">
+              <canvas id="roc_curve" height="100%" width="100%"></canvas>
+            </div><br> 
+            AUC: <b><span id="auc_value"></span></b>
+          </div>  
 
-          <br> 
-          AUC: <b><span id="auc_value"></span></b>
+          <p></p><br>
+          <b>Precision-Recall Curve</b>
+          <br><br>
+
+          <div class="responsive" class="chart-container">
+            <canvas id="pr_curve" height="100%" width="100%"></canvas>
+          </div>
         </div> <!-- end ROC -->
 
       </div> <!-- end tabs -->
@@ -329,6 +333,10 @@ var crit_t_value_beta;  // critical t with respect to the group 2 distribution, 
   var rocChart = getROCChart(roc_curve);
   rocChart.update();
   elem("auc_value").innerText = getAUC(axes);
+
+  var pr_curve = getPrecisionRecallCurve(axes);
+  var prChart = getPRChart(pr_curve);
+  prChart.update();
 
   var thumb = slider.querySelector('.thumb');
   var sliderPositionLeft = initThumb(axes.x_min, axes.x_max, thumb.offsetWidth, crit_t_init);
@@ -412,15 +420,11 @@ function updateState(crit_t_value, df, ncp){
   fnr = 1-tp;  // false negative rate
   fpr = 1-tn;  // false positive rate
   tnr = tn;  // true negative rate
-  
-  f1_score = (2*tp) / (2*tp + fp + fn); 
-  matthews_cc = (tp*tn - fp*fn) / math.sqrt((tp+fp)*(tp+fn)*(tn+fp)*(tn+fn));
-  diagnostic_odds_ratio = (tp*tn)/(fp*fn)
 
-  population_prevalence = prob_re.value;
-  ne = 1-population_prevalence;  // no effect probability 
-  retp = population_prevalence*tp;  // real effect true positive
-  refn = population_prevalence*fn;  // real effect false negative
+  prevalence = prob_re.value;
+  ne = 1-prevalence;  // no effect probability 
+  retp = prevalence*tp;  // real effect true positive
+  refn = prevalence*fn;  // real effect false negative
   netn = ne*tn;  // no effect true negative
   nefp = ne*fp;  // no effect false positive
 
@@ -435,8 +439,8 @@ function updateState(crit_t_value, df, ncp){
   // Calculate prevalence threshold
   prevalence_threshold = (math.sqrt(tpr*fpr)-fpr)/(tpr-fpr);
   
-  dataset_prevalence = (tp + fn)/2;
-  accuracy = (tp+tn)/2;
+  f1_score = 2*ppv*tpr/(ppv+tpr); 
+  balanced_accuracy = (tpr+tnr)/2
 
 
   // update display
@@ -452,7 +456,7 @@ function updateState(crit_t_value, df, ncp){
   showRejectOrNotReject(crit_t_value, t_value);
   updateProbabilityTree();
   updateROCCurve(alpha, beta);
-
+  updatePRCurve(beta, ppv, prevalence, axes);
 }
 
 
@@ -531,8 +535,6 @@ function updateConfusionMatrix(alpha, beta){
   elem("TNR").innerText = round(tnr);
 
   elem("f1_score").innerText = round(f1_score);
-  elem("matthews_cc").innerText = round(matthews_cc);
-  elem("diagnostic_odds_ratio").innerText = round(diagnostic_odds_ratio);
 
   // update line chart
   lineChart.options.annotation.annotations[1].label['content'] = '\u03B1 = ' + round(alpha);
@@ -544,11 +546,15 @@ function updateConfusionMatrix(alpha, beta){
 }
 
 function updateROCCurve(alpha, beta){
-  // update ROC curve
   rocChart.data.datasets[1]['data'] = [{x: alpha, y: 1-beta}];
   rocChart.update();
 }
 
+function updatePRCurve(beta, precision, prevalence, axes){
+  prChart.data.datasets[1]['data'] = [{x: 1-beta, y: precision}];
+  prChart.data.datasets[3]['data'] = getTruePrecisionRecallCurve(axes, prevalence);
+  prChart.update();
+}
 
 function showRejectOrNotReject(crit_t_value, t_value){
   // determine recommendation: to reject or not reject the null hypothesis
@@ -588,10 +594,7 @@ function updateProbabilityTree(){
   elem("npv").innerText = cleanNaN(round(npv));  
 
   elem("prevalence_threshold").innerText = cleanNaN(round(prevalence_threshold));
-
-  elem("population_prevalence").innerText = cleanNaN(round(population_prevalence));
-  elem("dataset_prevalence").innerText = cleanNaN(round(dataset_prevalence));
-  elem("accuracy").innerText = cleanNaN(round(accuracy));
+  elem("balanced_accuracy").innerText = cleanNaN(round(balanced_accuracy));
 }
 
 

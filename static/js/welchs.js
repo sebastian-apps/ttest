@@ -62,6 +62,46 @@ function getRocCurve(axes){
   return roc_curve;
 }
 
+function getPrecisionRecallCurve(axes){
+  console.log("axes.x_max", axes.x_max);
+  console.log("axes.x_min:", axes.x_min);
+  let partitions = 25;
+  step_size = (axes.x_max - axes.x_min)/partitions;
+  console.log("step_size:", step_size);
+  console.log();
+  pr_curve=[];
+  // crit_t_value_beta = crit_t_value - ncp;
+  for(var i = 0; i <= partitions; i++) {
+    pr_curve.push({
+      x: 1-getBeta(((axes.x_min+(i*step_size)))-ncp, df), 
+      y: 1-getFalseDiscoveryRate(getAlpha((axes.x_min+(i*step_size)), df), 1-getBeta(((axes.x_min+(i*step_size)))-ncp, df))    // 1-getFalseDiscoveryRate(FP, TP) 
+    });    
+  }
+  console.log("pr_curve:", pr_curve);
+  return pr_curve;
+}
+
+function getTruePrecisionRecallCurve(axes, population_prevalence){
+  console.log("axes.x_max", axes.x_max);
+  console.log("axes.x_min:", axes.x_min);
+  let partitions = 25;
+  step_size = (axes.x_max - axes.x_min)/partitions;
+  console.log("step_size:", step_size);
+  console.log();
+  pr_curve=[];
+  // crit_t_value_beta = crit_t_value - ncp;
+  for(var i = 0; i <= partitions; i++) {
+    pr_curve.push({
+      x: 1-getBeta(((axes.x_min+(i*step_size)))-ncp, df),
+      y: 1-getFalseDiscoveryRate(
+                                  (1-population_prevalence)*getAlpha((axes.x_min+(i*step_size)), df), 
+                                  population_prevalence*(1-getBeta(((axes.x_min+(i*step_size)))-ncp, df))
+                                )    // 1-getFalseDiscoveryRate(FP, TP)  
+    });    
+  }
+  console.log("pr_curve:", pr_curve);
+  return pr_curve;
+}
 
 function getAUC(axes){
   // calculate AUC using the left Riemann Sum
@@ -300,11 +340,6 @@ function getLineChart(axes, group1, group2, p_value, crit_t_value){
     });
 }
 
-
-
-
-
-
 function getROCChart(roc_curve){
   return new Chart(elem("roc_curve"), {
       type: 'scatter',
@@ -432,6 +467,101 @@ function getROCChart(roc_curve){
     });
 }
 
+
+
+function getPRChart(pr_curve){
+  return new Chart(elem("pr_curve"), {
+      type: 'scatter',
+      data: {
+        datasets: [{
+            data: [
+              {x: 0, y: 0},
+              {x: 1, y: 1},
+            ],
+            label: "refs",
+            borderColor: "transparent",
+            fill: false
+          },{
+            data: [], 
+            label: "PPV",
+            borderColor: "#000000",
+            backgroundColor: "#000000",
+            fill: true,
+            pointRadius: 4
+          },{
+            data: pr_curve,
+            label: "PR curve",
+            borderColor: "#7600bc",
+            // backgroundColor: "#ca5cdd",
+            fill: true
+            // ,pointRadius: 4
+          },{
+            data: [],
+            label: "True PR curve",
+            borderColor: "#000000",
+            backgroundColor: "#dedede",
+            fill: true
+            // ,pointRadius: 4
+          }
+        ]
+      },
+      options: {
+        animation: false,
+        title: {
+          display: false,
+          text: 't-test'
+        },
+        legend:{
+          position: 'bottom',
+          labels: {
+            filter: function(item, chart) {
+                return !item.text.includes('refs'); // Remove the refs legend item
+              },
+             usePointStyle: true,
+           },
+        },
+        elements: {
+          point:{
+              radius: 0
+          }
+        },
+        scales: {
+          xAxes: [{
+              ticks : {
+                min: 0,
+                stepSize: 0.2,
+                // stepValue: 0.2,
+                steps: 10,
+                max: 1,
+              },
+            display: true,
+            gridLines: {
+              display:false,
+            },
+            scaleLabel: {
+              display: true,
+              labelString: 'True positive rate (1 - \u03B2), Recall'
+            }
+          }],
+          yAxes: [{
+            ticks : {
+              min: 0,
+              stepSize: 0.2,
+              max: 1,
+            },
+            display: true,
+            scaleLabel: {
+              display: true,
+              labelString: 'Precision, PPV'
+            },
+            gridLines: {
+                display:false
+            }
+          }]
+        }
+      }
+    });
+}
 
     /*
     Functions below may be used at a future date.
