@@ -461,6 +461,8 @@ function updateState(crit_t_value, df, ncp){
   updateProbabilityTree();
   updateROCCurve(alpha, beta);
   updatePRCurve(beta, ppv, prevalence, axes);
+
+  doTests();
 }
 
 
@@ -649,6 +651,16 @@ function elem(elem_id){
   return document.getElementById(elem_id);
 }
 
+function doTests(){
+  console.log("tests...");
+  console.log(ppv, "0.1289", floatsAreEqual(ppv, 0.1289));
+  console.log(balanced_accuracy, "0.8413", floatsAreEqual(balanced_accuracy,  0.8413));
+  console.log(f1_score, "0.2193", floatsAreEqual(f1_score, 0.2193));
+}
+
+function floatsAreEqual(a, b, tolerance = 0.0001) {
+    return Math.abs(a - b) < tolerance;
+}
 
 </script>
 
