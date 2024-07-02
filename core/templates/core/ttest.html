@@ -246,7 +246,7 @@
             <div class="responsive" class="chart-container">
               <canvas id="roc_curve" height="100%" width="100%"></canvas>
             </div><br> 
-            AUC: <b><span id="auc_value"></span></b>
+            ROC-AUC: <b><span id="roc_auc_value"></span></b>
           </div>  
 
           <p></p><br>
@@ -255,7 +255,9 @@
 
           <div class="responsive" class="chart-container">
             <canvas id="pr_curve" height="100%" width="100%"></canvas>
-          </div>
+          </div><br> 
+          PR-AUC: <b><span id="pr_auc_value"></span></b><br>
+          True PR-AUC: <b><span id="true_pr_auc_value"></span></b>
         </div> <!-- end ROC -->
 
       </div> <!-- end tabs -->
@@ -311,6 +313,7 @@
 const ROUND_DECIMALS = 4;
 var crit_t_value;
 var crit_t_value_beta;  // critical t with respect to the group 2 distribution, not group 1
+var prevalence = prob_re.value;
 
 {% if test_results %}
   const group1 = {{ data1|safe }};
@@ -329,21 +332,25 @@ var crit_t_value_beta;  // critical t with respect to the group 2 distribution, 
 
   // Initialize
   var lineChart = getLineChart(axes, group1, group2, p_value, crit_t_init);  // previously: crit_t_value
+
   var roc_curve = getRocCurve(axes);
   var rocChart = getROCChart(roc_curve);
   rocChart.update();
-  elem("auc_value").innerText = getAUC(axes);
+  elem("roc_auc_value").innerText = getAUC(roc_curve);
 
   var pr_curve = getPrecisionRecallCurve(axes);
   var prChart = getPRChart(pr_curve);
   prChart.update();
+  elem("pr_auc_value").innerText = getAUC(pr_curve);
+
+  var true_pr_curve = getTruePrecisionRecallCurve(axes, prevalence);
+  elem("true_pr_auc_value").innerText = getAUC(true_pr_curve);
 
   var thumb = slider.querySelector('.thumb');
   var sliderPositionLeft = initThumb(axes.x_min, axes.x_max, thumb.offsetWidth, crit_t_init);
   // moveBar();
 
 {% endif %}
-
 
 
 
@@ -368,20 +375,17 @@ function initThumb(chart_x_min, chart_x_max, thumbOffsetWidth, crit_t_init){
   var new_thumb = convertChartXToScreenX(crit_t_init, chart_x_min, chart_x_max, x1, x2, offset);
   elem("thumb").style.left = new_thumb + "px";
 
-  // BELOW IS NEW
   // adjust the slider
   elem("slider").style.left = x1 + "px";
   elem("slider").style.width = x2 - x1 + "px";
   
   updateState(crit_t_init, df, ncp);
-
   return new_thumb;
 }
 
 
 
 function moveBar(){
-
   // get absolute x,y coordinates of the chart on the screen
   let points = lineChart.chart.getDatasetMeta(0).data;
   let x1 = points[0]._model.x;
@@ -405,6 +409,7 @@ function updateState(crit_t_value, df, ncp){
   // great resources for testing: https://www.medcalc.org/calc/diagnostic_test.php
   // https://onlineconfusionmatrix.com/
   
+  prevalence = prob_re.value;
   crit_t_value_beta = crit_t_value - ncp;  // ncp: non-centrality parameter
   alpha = getAlpha(crit_t_value, df);
   beta = getBeta(crit_t_value_beta, df);
@@ -421,7 +426,6 @@ function updateState(crit_t_value, df, ncp){
   fpr = 1-tn;  // false positive rate
   tnr = tn;  // true negative rate
 
-  prevalence = prob_re.value;
   ne = 1-prevalence;  // no effect probability 
   retp = prevalence*tp;  // real effect true positive
   refn = prevalence*fn;  // real effect false negative
@@ -471,7 +475,7 @@ function convertScreenXToChartX(x, x1, x2, chart_x1, chart_x2, thumbOffsetWidth)
 
 
 
-// OBTAIN MOUSE EVENT, DRAG SLIDER
+// Obtain mouse event, drag slider
 thumb.onmousedown = function(event) {
   event.preventDefault(); // prevent selection start (browser action)
   let shiftX = event.clientX - thumb.getBoundingClientRect().left;
@@ -505,7 +509,7 @@ thumb.ondragstart = function() {
 };
 
 
-// FOR MOBILE DEVICES ONLY, DRAG SLIDER
+// For mobile devices only, drag slider
 function moveThumbMobile(event) {
   sliderPositionLeft = event.touches[0].clientX - slider.getBoundingClientRect().left;
 
@@ -546,14 +550,19 @@ function updateConfusionMatrix(alpha, beta){
 }
 
 function updateROCCurve(alpha, beta){
+  // Update the position of the point on the ROC curve given the set alpha.
   rocChart.data.datasets[1]['data'] = [{x: alpha, y: 1-beta}];
   rocChart.update();
 }
 
 function updatePRCurve(beta, precision, prevalence, axes){
+  // Update the position of the point on the Precision-Recall curve given the set alpha.
   prChart.data.datasets[1]['data'] = [{x: 1-beta, y: precision}];
-  prChart.data.datasets[3]['data'] = getTruePrecisionRecallCurve(axes, prevalence);
+
+  true_pr_curve = getTruePrecisionRecallCurve(axes, prevalence);
+  prChart.data.datasets[3]['data'] = true_pr_curve;
   prChart.update();
+  elem("true_pr_auc_value").innerText = getAUC(true_pr_curve);
 }
 
 function showRejectOrNotReject(crit_t_value, t_value){
@@ -635,7 +644,7 @@ function round(val){
 }
 
 
-// provides shorthand for getting element id
+// Get element id
 function elem(elem_id){
   return document.getElementById(elem_id);
 }

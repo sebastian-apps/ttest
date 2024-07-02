@@ -33,7 +33,6 @@ class Data:
 
 
     def create_t_dist(self, min, max, ncp):
-
         """ Create x,y coordinates of t distribution for a given range. """
         self.step_size = (max - min) / 50   # 50 is an arbitrary number
         t_list = [round(min + self.step_size*i, 6) for i in range(0, 50)]
@@ -66,12 +65,8 @@ class Data:
         }
 
 
-
-
-
-
 def ttest(request):
-
+    """Perform the Welch's t-test."""
     model_instance = None
     test_results = {}
     axes = {}
@@ -105,7 +100,6 @@ def ttest(request):
             return render(request, 'core/ttest.html', context)
 
     try:
-
         data1 = Data(dataset1)
         data2 = Data(dataset2)
 
@@ -127,7 +121,6 @@ def ttest(request):
         # Get distribution x,y values for plotting.
         data1.create_t_dist(x_min, x_max, 0)
         data2.create_t_dist(x_min, x_max, ncp)
-
 
         # Configure the x-axis step size for a more visually appealing chart.
         if data1.step_size > data2.step_size:
@@ -151,11 +144,8 @@ def ttest(request):
         test_results.update({"crit_t_init": 1.8331})  # equiv to alpha=0.05. previoiusly: st.norm.ppf(.95), Arbitrary starting point (alpha=0.05), opposite is st.norm.cdf(1.64)
         axes.update({"x_min": x_min, "x_max": x_max, "y_max": y_max, "step_size": step_size})
 
-
     except Exception as e:
         print(str(e))
-
-
 
     context = { 'form': form, 'data1': data1.clean(), 'data2': data2.clean(),
                 'test_results': test_results, 'axes': json.dumps(axes), 'autoscroll_down': autoscroll_down
@@ -166,8 +156,6 @@ def ttest(request):
 
 def get_x_axis_min_max(data1, data2, ncp):
     return -st.norm.ppf(.999999), ncp + st.norm.ppf(.999999)
-
-
 
 
 def get_df(data1, data2):
@@ -201,23 +189,20 @@ def get_effect_size_ncp(data1, data2):
     return round(es, DEC), ncp
 
 
-
-
 def get_y_axis_max(dist_dist1, dist_dist2):
     l1 = [coord.get('y') for coord in dist_dist1]
     l2 = [coord.get('y') for coord in dist_dist2]
     return max(l1 + l2)
 
 
-
 def prep_for_form(num_list):
-    # Prep list for output in dataset form field
+    """Prep list for output in dataset form field"""
     return str(num_list).replace(", ","\n").replace("[","").replace("]","")
 
 
 def clean_dataset(dataset):
-    # Some cleaning done at the model level. Additional cleaning
-    # may be performed here.
+    """Some cleaning done at the model level. Additional cleaning
+    # may be performed here."""
     dataset = dataset.splitlines()
     try:
         dataset = [float(data) for data in dataset]

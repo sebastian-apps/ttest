@@ -28,8 +28,6 @@ function drawAlphaCurve(group1, crit_t_value){
   }
   
 
-
-
 function t_Distrib(t, dof){
   // For a given x, return the t distribution y value.
   y = (math.gamma((dof+1)/2)/(math.sqrt(dof*math.pi)*math.gamma(dof/2))) * (1+((t**2)/dof))**(-(dof+1)/2);
@@ -47,12 +45,8 @@ function getBeta(crit_t_value_beta, df){
 
 
 function getRocCurve(axes){
-  console.log("axes.x_max", axes.x_max);
-  console.log("axes.x_min:", axes.x_min);
-  let partitions = 25;
+  let partitions = 50;
   step_size = (axes.x_max - axes.x_min)/partitions;
-  console.log("step_size:", step_size);
-  console.log();
   roc_curve=[];
   // crit_t_value_beta = crit_t_value - ncp;
   for(var i = 0; i <= partitions; i++) {
@@ -63,12 +57,8 @@ function getRocCurve(axes){
 }
 
 function getPrecisionRecallCurve(axes){
-  console.log("axes.x_max", axes.x_max);
-  console.log("axes.x_min:", axes.x_min);
-  let partitions = 25;
+  let partitions = 50;
   step_size = (axes.x_max - axes.x_min)/partitions;
-  console.log("step_size:", step_size);
-  console.log();
   pr_curve=[];
   // crit_t_value_beta = crit_t_value - ncp;
   for(var i = 0; i <= partitions; i++) {
@@ -82,12 +72,8 @@ function getPrecisionRecallCurve(axes){
 }
 
 function getTruePrecisionRecallCurve(axes, population_prevalence){
-  console.log("axes.x_max", axes.x_max);
-  console.log("axes.x_min:", axes.x_min);
-  let partitions = 25;
+  let partitions = 50;
   step_size = (axes.x_max - axes.x_min)/partitions;
-  console.log("step_size:", step_size);
-  console.log();
   pr_curve=[];
   // crit_t_value_beta = crit_t_value - ncp;
   for(var i = 0; i <= partitions; i++) {
@@ -103,28 +89,15 @@ function getTruePrecisionRecallCurve(axes, population_prevalence){
   return pr_curve;
 }
 
-function getAUC(axes){
-  // calculate AUC using the left Riemann Sum
-  console.log("axes.x_max", axes.x_max);
-  console.log("axes.x_min:", axes.x_min);
-  let partitions = 500;
-  let step_size = (axes.x_max - axes.x_min)/partitions;
-  console.log("step_size:", step_size);
-  console.log();
-  let roc_curve=[];
+function getAUC(curve){
+  // Calculate the area under the curve using the left Riemann Sum.
+  // The greater the number of datapoints, the miore accurate the calculation.
   let auc = 0;
-  for (var i = 0; i <= partitions; i++) {
-    roc_curve.push({x: getAlpha((axes.x_min+(i*step_size)), df), y: 1-getBeta(((axes.x_min+(i*step_size)))-ncp, df)});    
+  for (var i = 0; i < curve.length-1; i++) {
+    auc = auc + (curve[i].x-curve[i+1].x)*curve[i].y;
   }
-  // calculate left Riemann Sum
-  for (var i = 0; i < roc_curve.length-1; i++) {
-    auc = auc + (roc_curve[i].x-roc_curve[i+1].x)*roc_curve[i].y;
-  }
-
-  console.log("auc:", auc);
   return math.round(auc, 2);
 }
-
 
 function getFalseDiscoveryRate(FP, TP){
   /*Calculate the False Discovery Rate (FDR)
