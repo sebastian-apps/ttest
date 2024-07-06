@@ -333,17 +333,17 @@ var prevalence = prob_re.value;
   // Initialize
   var lineChart = getLineChart(axes, group1, group2, p_value, crit_t_init);  // previously: crit_t_value
 
-  var roc_curve = getRocCurve(axes);
+  var roc_curve = getROCCurve(axes, df, ncp);
   var rocChart = getROCChart(roc_curve);
   rocChart.update();
   elem("roc_auc_value").innerText = getAUC(roc_curve);
 
-  var pr_curve = getPrecisionRecallCurve(axes);
+  var pr_curve = getPrecisionRecallCurve(axes, df, ncp);
   var prChart = getPRChart(pr_curve);
   prChart.update();
   elem("pr_auc_value").innerText = getAUC(pr_curve);
 
-  var true_pr_curve = getTruePrecisionRecallCurve(axes, prevalence);
+  var true_pr_curve = getTruePrecisionRecallCurve(axes, df, ncp, prevalence);
   elem("true_pr_auc_value").innerText = getAUC(true_pr_curve);
 
   var thumb = slider.querySelector('.thumb');
@@ -454,11 +454,39 @@ function updateState(crit_t_value, df, ncp){
   lineChart.options.annotation.annotations[1]['value'] = crit_t_value;
   lineChart.update();
 
+
+  data = {
+    alpha: alpha,
+    beta: beta,
+    confidence: confidence,
+    power: power,
+    tp: tp,
+    fn: fn,
+    fp: fp,
+    tn: tn,
+    ne: ne,
+    tpr: tpr,
+    fnr: fnr,
+    fpr: fpr,
+    tnr: tnr,
+    retp: retp,
+    refn: refn,
+    netn: netn,
+    nefp: nefp,
+    ppv: ppv,
+    fdr: fdr,
+    falseomrate: falseomrate,
+    npv: npv,
+    prevalence_threshold: prevalence_threshold,
+    balanced_accuracy: balanced_accuracy,
+    f1_score: f1_score,
+  }
+
   drawAlphaCurve(group1, crit_t_value);
   drawBetaCurve(group2, crit_t_value);
-  updateConfusionMatrix(alpha, beta);
+  updateConfusionMatrix(data);
   showRejectOrNotReject(crit_t_value, t_value);
-  updateProbabilityTree();
+  updateProbabilityTree(data);
   updateROCCurve(alpha, beta);
   updatePRCurve(beta, ppv, prevalence, axes);
 
@@ -528,22 +556,22 @@ function moveThumbMobile(event) {
 }
 
 
-function updateConfusionMatrix(alpha, beta){
+function updateConfusionMatrix(d){
 
-  elem("alpha").innerText = round(alpha);
-  elem("confidence").innerText = round(confidence);
-  elem("beta").innerText = round(beta);
-  elem("power").innerText = round(power);
+  elem("alpha").innerText = round(d.alpha);
+  elem("confidence").innerText = round(d.confidence);
+  elem("beta").innerText = round(d.beta);
+  elem("power").innerText = round(d.power);
 
-  elem("TPR").innerText = round(tpr);
-  elem("FNR").innerText = round(fnr);
-  elem("FPR").innerText = round(fpr);
-  elem("TNR").innerText = round(tnr);
+  elem("TPR").innerText = round(d.tpr);
+  elem("FNR").innerText = round(d.fnr);
+  elem("FPR").innerText = round(d.fpr);
+  elem("TNR").innerText = round(d.tnr);
 
-  elem("f1_score").innerText = round(f1_score);
+  elem("f1_score").innerText = round(d.f1_score);
 
   // update line chart
-  lineChart.options.annotation.annotations[1].label['content'] = '\u03B1 = ' + round(alpha);
+  lineChart.options.annotation.annotations[1].label['content'] = '\u03B1 = ' + round(d.alpha);
   lineChart.update();
 
   // Option to have Hypothesis Testing boxes change color intensity according to magnitude of alpha and beta probability
@@ -561,7 +589,7 @@ function updatePRCurve(beta, precision, prevalence, axes){
   // Update the position of the point on the Precision-Recall curve given the set alpha.
   prChart.data.datasets[1]['data'] = [{x: 1-beta, y: precision}];
 
-  true_pr_curve = getTruePrecisionRecallCurve(axes, prevalence);
+  true_pr_curve = getTruePrecisionRecallCurve(axes, df, ncp, prevalence);
   prChart.data.datasets[3]['data'] = true_pr_curve;
   prChart.update();
   elem("true_pr_auc_value").innerText = getAUC(true_pr_curve);
@@ -587,25 +615,25 @@ function showRejectOrNotReject(crit_t_value, t_value){
 }
 
 
-function updateProbabilityTree(){
+function updateProbabilityTree(d){
 
-  elem("prob_ne").innerText = round(ne);
-  elem("prob_tp").innerText = round(tp);
-  elem("prob_fn").innerText = round(fn);
-  elem("prob_tn").innerText = round(tn);
-  elem("prob_fp").innerText = round(fp);
-  elem("prob_retp").innerText = round(retp);
-  elem("prob_refn").innerText = round(refn);
-  elem("prob_netn").innerText = round(netn);
-  elem("prob_nefp").innerText = round(nefp);
+  elem("prob_ne").innerText = round(d.ne);
+  elem("prob_tp").innerText = round(d.tp);
+  elem("prob_fn").innerText = round(d.fn);
+  elem("prob_tn").innerText = round(d.tn);
+  elem("prob_fp").innerText = round(d.fp);
+  elem("prob_retp").innerText = round(d.retp);
+  elem("prob_refn").innerText = round(d.refn);
+  elem("prob_netn").innerText = round(d.netn);
+  elem("prob_nefp").innerText = round(d.nefp);
 
-  elem("ppv").innerText = cleanNaN(round(ppv));
-  elem("false_rate").innerText = cleanNaN(round(fdr));
-  elem("for").innerText = cleanNaN(round(falseomrate));
-  elem("npv").innerText = cleanNaN(round(npv));  
+  elem("ppv").innerText = cleanNaN(round(d.ppv));
+  elem("false_rate").innerText = cleanNaN(round(d.fdr));
+  elem("for").innerText = cleanNaN(round(d.falseomrate));
+  elem("npv").innerText = cleanNaN(round(d.npv));  
 
-  elem("prevalence_threshold").innerText = cleanNaN(round(prevalence_threshold));
-  elem("balanced_accuracy").innerText = cleanNaN(round(balanced_accuracy));
+  elem("prevalence_threshold").innerText = cleanNaN(round(d.prevalence_threshold));
+  elem("balanced_accuracy").innerText = cleanNaN(round(d.balanced_accuracy));
 }
 
 

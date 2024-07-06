@@ -2,7 +2,7 @@ function drawAlphaCurve(group1, crit_t_value){
     // Fill the area under the curve representing alpha.
     let alpha_curve = [];
     // this datapoint connects with the critical t vertical line
-    alpha_curve.push({x: crit_t_value, y: t_Distrib(crit_t_value, group1.df)});
+    alpha_curve.push({x: crit_t_value, y: tDistrib(crit_t_value, group1.df)});
     for(var i = 0; i < group1.dist.length; i++) {
       if (group1.dist[i]['x'] > crit_t_value){
         alpha_curve.push({x: group1.dist[i]['x'], y: group1.dist[i]['y']});
@@ -22,13 +22,13 @@ function drawAlphaCurve(group1, crit_t_value){
       }
     }
     // this datapoint connects with the critical t vertical line
-    beta_curve.push({x: crit_t_value, y: t_Distrib(crit_t_value-ncp, group2.df)}); // ncp acts as offset
+    beta_curve.push({x: crit_t_value, y: tDistrib(crit_t_value-ncp, group2.df)}); // ncp acts as offset
     lineChart.data.datasets[4]['data'] = beta_curve;
     lineChart.update();
   }
   
 
-function t_Distrib(t, dof){
+function tDistrib(t, dof){
   // For a given x, return the t distribution y value.
   y = (math.gamma((dof+1)/2)/(math.sqrt(dof*math.pi)*math.gamma(dof/2))) * (1+((t**2)/dof))**(-(dof+1)/2);
   return math.round(y, 6);
@@ -44,7 +44,7 @@ function getBeta(crit_t_value_beta, df){
 }
 
 
-function getRocCurve(axes){
+function getROCCurve(axes, df, ncp){
   let partitions = 50;
   step_size = (axes.x_max - axes.x_min)/partitions;
   roc_curve=[];
@@ -52,14 +52,13 @@ function getRocCurve(axes){
   for(var i = 0; i <= partitions; i++) {
     roc_curve.push({x: getAlpha((axes.x_min+(i*step_size)), df), y: 1-getBeta(((axes.x_min+(i*step_size)))-ncp, df)});    
   }
-  console.log("roc_curve:", roc_curve);
   return roc_curve;
 }
 
 function getPrecisionRecallCurve(axes){
   let partitions = 50;
   step_size = (axes.x_max - axes.x_min)/partitions;
-  pr_curve=[];
+  let pr_curve=[];
   // crit_t_value_beta = crit_t_value - ncp;
   for(var i = 0; i <= partitions; i++) {
     pr_curve.push({
@@ -67,14 +66,13 @@ function getPrecisionRecallCurve(axes){
       y: 1-getFalseDiscoveryRate(getAlpha((axes.x_min+(i*step_size)), df), 1-getBeta(((axes.x_min+(i*step_size)))-ncp, df))    // 1-getFalseDiscoveryRate(FP, TP) 
     });    
   }
-  console.log("pr_curve:", pr_curve);
   return pr_curve;
 }
 
-function getTruePrecisionRecallCurve(axes, population_prevalence){
+function getTruePrecisionRecallCurve(axes, df, ncp, population_prevalence){
   let partitions = 50;
   step_size = (axes.x_max - axes.x_min)/partitions;
-  pr_curve=[];
+  let pr_curve=[];
   // crit_t_value_beta = crit_t_value - ncp;
   for(var i = 0; i <= partitions; i++) {
     pr_curve.push({
@@ -85,7 +83,6 @@ function getTruePrecisionRecallCurve(axes, population_prevalence){
                                 )    // 1-getFalseDiscoveryRate(FP, TP)  
     });    
   }
-  console.log("pr_curve:", pr_curve);
   return pr_curve;
 }
 
