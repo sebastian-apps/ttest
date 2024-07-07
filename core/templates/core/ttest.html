@@ -142,8 +142,6 @@
       <label for="tab-nav-3">AUC</label>
 
       <div class="tabs">
-
-
         <div class="tab">
           <br>
           <i>H<sub>0</sub></i>: population 1 mean = population 2 mean<br>
@@ -276,7 +274,6 @@
 
 
 <div id="BlackWindow">
-
   <a name="more-info"></a>
   <div class="more-info">
     <h4>More information</h4>
@@ -284,13 +281,10 @@
     The Welch's <i>t</i>-test, or unequal variances <i>t</i>-test, can test hypotheses such as whether the means of two independent normally-distributed populations are equal. While the commonly-used Student <i>t</i>-test requires that the two samples share equal variances and equal sample sizes, the Welch’s <i>t</i>-test does not have this requirement. Researchers argue that the Welch’s <i>t</i>-test is more versatile and should instead be used by default.<sup>1,2</sup>
     <br><br>
     Statistical rigor can be achieved with <i>t</i>-tests, yet the significance level is set arbitrarily. While lowering significance levels mitigates false positives (&#945;), the probability of false negatives (&#946;) increases, and tests may fail to detect existing effects.<sup>3</sup>
-  </div>
-  <br>
-
-
+  </div><br>
 </div>
-<div id="WhiteWindow">
 
+<div id="WhiteWindow">
     <h4>References</h4>
 
     1. Dahiru, T. P-value, a true test of statistical significance? A cautionary note. <i>Annals of Ibadan Postgraduate Medicine.</i> 2008, <i>6</i>(1): 21–26.
@@ -300,12 +294,7 @@
     3. Benjamin, D.J.; Berger, J.O.; Johannesson, M. et al. Redefine statistical significance. <i>Nature Human Behaviour.</i> 2018, <i>2</i>, 6–10.
     <br>
     4. Colquhoun, D. An investigation of the false discovery rate and the misinterpretation of p-values. <i>Royal Society Open Science.</i> 2014, <i>1</i>(3): 140216.
-
 </div>  <!-- container -->
-
-
-
-
 
 
 <script>
@@ -353,56 +342,12 @@ var prevalence = prob_re.value;
 {% endif %}
 
 
-
 // If user submits form, scroll down to results.
 if (autoscroll) {
   document.querySelector('#ContainerWindow').scrollIntoView({ 
     behavior: 'smooth' 
   });
 }
-
-
-
-function initThumb(chart_x_min, chart_x_max, thumbOffsetWidth, crit_t_init){
-  // Initial position of the slider thumb.
-  console.log("crit_t_init:", crit_t_init);
-  var points = lineChart.chart.getDatasetMeta(0).data;
-  var x1 = points[0]._model.x;
-  var x2 = points[1]._model.x;
-
-  // convert chart x value to the x screen position for the slider thumb
-  var offset = thumb.offsetWidth/2; 
-  var new_thumb = convertChartXToScreenX(crit_t_init, chart_x_min, chart_x_max, x1, x2, offset);
-  elem("thumb").style.left = new_thumb + "px";
-
-  // adjust the slider
-  elem("slider").style.left = x1 + "px";
-  elem("slider").style.width = x2 - x1 + "px";
-  
-  updateState(crit_t_init, df, ncp);
-  return new_thumb;
-}
-
-
-
-function moveBar(){
-  // get absolute x,y coordinates of the chart on the screen
-  let points = lineChart.chart.getDatasetMeta(0).data;
-  let x1 = points[0]._model.x;
-  let y1 = points[0]._model.y;
-  let x2 = points[1]._model.x;
-  let y2 = points[1]._model.y;
-
-  // adjust the slider
-  elem("slider").style.left = x1 + "px";
-  elem("slider").style.width = x2 - x1 + "px";
-
-  // draw the critical t vertical line
-  crit_t_value = round(convertScreenXToChartX(sliderPositionLeft, x1, x2, axes.x_min, axes.x_max, thumb.offsetWidth));
-  updateState(crit_t_value, df, ncp);
-
-}
-
 
 function updateState(crit_t_value, df, ncp){
   // calculations
@@ -446,14 +391,12 @@ function updateState(crit_t_value, df, ncp){
   f1_score = 2*ppv*tpr/(ppv+tpr); 
   balanced_accuracy = (tpr+tnr)/2
 
-
   // update display
   elem('crit_t_value').innerText = crit_t_value;
   elem('sig-level').innerText = round(alpha);
 
   lineChart.options.annotation.annotations[1]['value'] = crit_t_value;
   lineChart.update();
-
 
   data = {
     alpha: alpha,
@@ -490,69 +433,7 @@ function updateState(crit_t_value, df, ncp){
   updateROCCurve(alpha, beta);
   updatePRCurve(beta, ppv, prevalence, axes);
 
-  doTests();
-}
-
-
-function convertChartXToScreenX(x, chart_x_min, chart_x_max, x1, x2, offset){
-  //return math.round((((x - chart_x_min)/(chart_x_max - chart_x_min))*(x2-x1)) - offset,0);
-  return (((x - chart_x_min)/(chart_x_max - chart_x_min))*(x2-x1)) - offset;
-}
-
-function convertScreenXToChartX(x, x1, x2, chart_x1, chart_x2, thumbOffsetWidth){
-  return (x + (thumbOffsetWidth/2))/(x2 - x1)*(chart_x2-chart_x1) + chart_x1;
-}
-
-
-
-// Obtain mouse event, drag slider
-thumb.onmousedown = function(event) {
-  event.preventDefault(); // prevent selection start (browser action)
-  let shiftX = event.clientX - thumb.getBoundingClientRect().left;
-  document.addEventListener('mousemove', onMouseMove);
-  document.addEventListener('mouseup', onMouseUp);
-
-  function onMouseMove(event) {
-    sliderPositionLeft = event.clientX - shiftX - slider.getBoundingClientRect().left;
-    // the pointer is out of slider => lock the thumb within the boundaries
-    if (sliderPositionLeft < 0) {
-      sliderPositionLeft = 0;
-    }
-    let rightEdge = slider.offsetWidth - thumb.offsetWidth;
-    if (sliderPositionLeft > rightEdge) {
-      sliderPositionLeft = rightEdge;
-    }
-
-    thumb.style.left = sliderPositionLeft + 'px';
-    moveBar();
-  }
-
-  function onMouseUp() {
-    document.removeEventListener('mouseup', onMouseUp);
-    document.removeEventListener('mousemove', onMouseMove);
-  }
-
-};
-
-thumb.ondragstart = function() {
-  return false;
-};
-
-
-// For mobile devices only, drag slider
-function moveThumbMobile(event) {
-  sliderPositionLeft = event.touches[0].clientX - slider.getBoundingClientRect().left;
-
-  // the pointer is out of slider => lock the thumb within the boundaries
-  if (sliderPositionLeft < 0) {
-    sliderPositionLeft = 0;
-  }
-  let rightEdge = slider.offsetWidth - thumb.offsetWidth;
-  if (sliderPositionLeft > rightEdge) {
-    sliderPositionLeft = rightEdge;
-  }
-  thumb.style.left = sliderPositionLeft + 'px';
-  moveBar();
+  doTests(data);
 }
 
 
@@ -579,11 +460,13 @@ function updateConfusionMatrix(d){
   //elem('beta-box').style = "background-color: rgba(0, 0, 255, "+ (Math.round(beta * 1000)*0.6 / (1000)).toFixed(3) +");"
 }
 
+
 function updateROCCurve(alpha, beta){
   // Update the position of the point on the ROC curve given the set alpha.
   rocChart.data.datasets[1]['data'] = [{x: alpha, y: 1-beta}];
   rocChart.update();
 }
+
 
 function updatePRCurve(beta, precision, prevalence, axes){
   // Update the position of the point on the Precision-Recall curve given the set alpha.
@@ -594,6 +477,7 @@ function updatePRCurve(beta, precision, prevalence, axes){
   prChart.update();
   elem("true_pr_auc_value").innerText = getAUC(true_pr_curve);
 }
+
 
 function showRejectOrNotReject(crit_t_value, t_value){
   // determine recommendation: to reject or not reject the null hypothesis
@@ -674,26 +558,125 @@ function round(val){
 }
 
 
-// Get element id
 function elem(elem_id){
   return document.getElementById(elem_id);
 }
 
-function doTests(){
+
+function doTests(d){
   console.log("tests...");
-  console.log(ppv, "0.1289", floatsAreEqual(ppv, 0.1289));
-  console.log(balanced_accuracy, "0.8413", floatsAreEqual(balanced_accuracy,  0.8413));
-  console.log(f1_score, "0.2193", floatsAreEqual(f1_score, 0.2193));
+  console.log(d.ppv, "0.1289", floatsAreEqual(d.ppv, 0.1289));
+  console.log(d.balanced_accuracy, "0.8413", floatsAreEqual(d.balanced_accuracy,  0.8413));
+  console.log(d.f1_score, "0.2193", floatsAreEqual(d.f1_score, 0.2193));
 }
+
 
 function floatsAreEqual(a, b, tolerance = 0.0001) {
     return Math.abs(a - b) < tolerance;
 }
 
+
+function convertChartXToScreenX(x, chart_x_min, chart_x_max, x1, x2, offset){
+  return (((x - chart_x_min)/(chart_x_max - chart_x_min))*(x2-x1)) - offset;
+}
+
+function convertScreenXToChartX(x, x1, x2, chart_x1, chart_x2, thumbOffsetWidth){
+  return (x + (thumbOffsetWidth/2))/(x2 - x1)*(chart_x2-chart_x1) + chart_x1;
+}
+
+
+function initThumb(chart_x_min, chart_x_max, thumbOffsetWidth, crit_t_init){
+  // Initial position of the slider thumb.
+  console.log("crit_t_init:", crit_t_init);
+  var points = lineChart.chart.getDatasetMeta(0).data;
+  var x1 = points[0]._model.x;
+  var x2 = points[1]._model.x;
+
+  // convert chart x value to the x screen position for the slider thumb
+  var offset = thumb.offsetWidth/2; 
+  var new_thumb = convertChartXToScreenX(crit_t_init, chart_x_min, chart_x_max, x1, x2, offset);
+  elem("thumb").style.left = new_thumb + "px";
+
+  // adjust the slider
+  elem("slider").style.left = x1 + "px";
+  elem("slider").style.width = x2 - x1 + "px";
+  
+  updateState(crit_t_init, df, ncp);
+  return new_thumb;
+}
+
+
+function moveBar(){
+  // get absolute x,y coordinates of the chart on the screen
+  let points = lineChart.chart.getDatasetMeta(0).data;
+  let x1 = points[0]._model.x;
+  let y1 = points[0]._model.y;
+  let x2 = points[1]._model.x;
+  let y2 = points[1]._model.y;
+
+  // adjust the slider
+  elem("slider").style.left = x1 + "px";
+  elem("slider").style.width = x2 - x1 + "px";
+
+  // draw the critical t vertical line
+  crit_t_value = round(convertScreenXToChartX(sliderPositionLeft, x1, x2, axes.x_min, axes.x_max, thumb.offsetWidth));
+  updateState(crit_t_value, df, ncp);
+}
+
+
+// Obtain mouse event, drag slider
+thumb.onmousedown = function(event) {
+  event.preventDefault(); // prevent selection start (browser action)
+  let shiftX = event.clientX - thumb.getBoundingClientRect().left;
+  document.addEventListener('mousemove', onMouseMove);
+  document.addEventListener('mouseup', onMouseUp);
+
+  function onMouseMove(event) {
+    sliderPositionLeft = event.clientX - shiftX - slider.getBoundingClientRect().left;
+    // the pointer is out of slider => lock the thumb within the boundaries
+    if (sliderPositionLeft < 0) {
+      sliderPositionLeft = 0;
+    }
+    let rightEdge = slider.offsetWidth - thumb.offsetWidth;
+    if (sliderPositionLeft > rightEdge) {
+      sliderPositionLeft = rightEdge;
+    }
+
+    thumb.style.left = sliderPositionLeft + 'px';
+    moveBar();
+  }
+
+  function onMouseUp() {
+    document.removeEventListener('mouseup', onMouseUp);
+    document.removeEventListener('mousemove', onMouseMove);
+  }
+};
+
+
+thumb.ondragstart = function() {
+  return false;
+};
+
+
+// For mobile devices only, drag slider
+function moveThumbMobile(event) {
+  sliderPositionLeft = event.touches[0].clientX - slider.getBoundingClientRect().left;
+
+  // the pointer is out of slider => lock the thumb within the boundaries
+  if (sliderPositionLeft < 0) {
+    sliderPositionLeft = 0;
+  }
+  let rightEdge = slider.offsetWidth - thumb.offsetWidth;
+  if (sliderPositionLeft > rightEdge) {
+    sliderPositionLeft = rightEdge;
+  }
+  thumb.style.left = sliderPositionLeft + 'px';
+  moveBar();
+}
+
+
+
 </script>
-
-
-
 
 </body>
 </html>
